@@ -15,13 +15,13 @@ To install the library, enter the following command in your console:
 
     npm i ngx-tooltip-directives
         
-Import `TooltipModule`:
+Import `NgxTooltipDirectivesModule`:
 
 ```ts
-import { TooltipModule } from 'ngx-tooltip-directives';
+import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
  
 @NgModule({
-    imports: [ TooltipModule ]
+    imports: [ NgxTooltipDirectivesModule ]
 }) 
 ```
 
@@ -36,17 +36,16 @@ import { TooltipModule } from 'ngx-tooltip-directives';
 2 - Pass the tooltip content as SafeHtml via `tooltipHtml`:
 
 ```ts
-  import { Component, OnInit } from '@angular/core';
-  import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-  tooltipHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
-  safeTooltipHtml!: SafeHtml;
+tooltipHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
+safeTooltipHtml!: SafeHtml;
 
-  constructor(private sanitizer: DomSanitizer){ }
+constructor(private sanitizer: DomSanitizer){ }
 
-  ngOnInit(): void {
-    this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
-  }
+ngOnInit(): void {
+  this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
+}
 ```
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
@@ -56,9 +55,9 @@ import { TooltipModule } from 'ngx-tooltip-directives';
 
 ```html
 <ng-template #tooltipTemplate>
-	<div style="color: blue; font-weight: bold;">
-        Tooltip Template
-	</div>
+  <div style="color: blue; font-weight: bold;">
+    Tooltip Template
+  </div>
 </ng-template>
 
 <div [tooltipTemplate]="tooltipTemplate" placement="right">Show Tooltip Template</div>
