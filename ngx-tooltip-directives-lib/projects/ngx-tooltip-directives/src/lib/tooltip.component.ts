@@ -46,6 +46,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
     @HostBinding('class.tooltip-hide') hostClassHide!: boolean;
     @HostBinding('class.tooltip-display-none') hostClassDisplayNone!: boolean;
     @HostBinding('class.tooltip-shadow') hostClassShadow!: boolean;
+	@HostBinding('class.tooltip-clickable') hostClassClickable!: boolean;
 
 	@HostBinding('style.--tooltip-text-color') textColor!: string;
 	@HostBinding('style.--tooltip-text-align') textAlign!: string;
@@ -291,7 +292,8 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		this.hostStylePadding = options.padding ?? defaultOptions.padding!;
 		this.backgroundColor = options.backgroundColor ?? defaultOptions.backgroundColor!;
 		this.borderColor = options.borderColor ?? defaultOptions.borderColor!;
-        this.hostClassShadow = options.shadow ?? true;        
+        this.hostClassShadow = options.shadow ?? true;
+		this.hostClassClickable = options?.trigger === 'click';
 
 		if (options.maxWidth) {
 			this.hostStyleMaxWidth = options.maxWidth;

@@ -10,12 +10,7 @@
   opacity: 0;
   transition: opacity 300ms;
   top: 0;
-  left: 0;
-  
-  .tooltip-label {
-    cursor: pointer;
-    text-align: var(--tooltip-text-align);
-  }
+  left: 0; 
 
   &.tooltip-show {
     opacity: 1;
@@ -32,6 +27,16 @@
   &.tooltip-shadow {
     box-shadow: 0 7px 15px -5px rgba(0, 0, 0, 0.4);
   }
+
+  .tooltip-label {
+    text-align: var(--tooltip-text-align);
+  } 
+
+  &.tooltip-clickable {
+    .tooltip-label {
+      cursor: pointer;
+    } 
+  }  
 
   &.tooltip {
     border: 1px solid rgba(0, 0, 0, .06);
