@@ -35,20 +35,21 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
 
 2 - Pass the tooltip content as SafeHtml via `tooltipHtml`:
 
-```ts
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
-tooltipHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
-safeTooltipHtml!: SafeHtml;
-
-constructor(private sanitizer: DomSanitizer){ }
-
-ngOnInit(): void {
-  this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
-}
-```
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
+```
+```ts
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+// Code skipped for brevity
+
+export class AppComponent {
+  rawHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
+  safeTooltipHtml: SafeHtml;
+
+  constructor(private sanitizer: DomSanitizer){ 
+    this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.rawHtml);
+  }
+}
 ```
 
 3 - Pass the tooltip content as template via `tooltipTemplate`:
@@ -74,14 +75,14 @@ ngOnInit(): void {
 
 2 - Options can be passed to the tooltips as TooltipOptions object:
 
+```html
+<div tooltipStr="Tooltip on the right" [options]="myOptions">Show Tooltip</div>
+```
 ```ts
 myOptions: TooltipOptions = {
     'placement': 'right',
     'showDelay': 500
 }
-```
-```html
-<div tooltipStr="Tooltip on the right" [options]="myOptions">Show Tooltip</div>
 ```
 
 
