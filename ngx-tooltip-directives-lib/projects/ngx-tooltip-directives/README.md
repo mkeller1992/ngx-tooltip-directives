@@ -142,6 +142,7 @@ Events are called in accordance with the delays specified in the options within 
 | {type: "hide", position: DOMRect} | This event is fired prior to the tooltip being hidden. |
 | {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |
 
+
 ## Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.
