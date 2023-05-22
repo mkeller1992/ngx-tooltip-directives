@@ -1,0 +1,18 @@
+<div class="tooltip-arrow"></div>
+
+<div *ngIf="currentContentType === 'string'"
+		(click)="handleTooltipClick()"
+		class="tooltip-label">
+		{{ tooltipStr }}
+</div>
+
+<div *ngIf="currentContentType === 'html'"
+		(click)="handleTooltipClick()"
+		class="tooltip-label"
+		[innerHTML]="tooltipHtml">
+</div>
+
+<div *ngIf="currentContentType === 'template'">
+	<ng-container *ngTemplateOutlet="tooltipTemplate"></ng-container>
+</div>
+

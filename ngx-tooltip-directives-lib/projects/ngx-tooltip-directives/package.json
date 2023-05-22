@@ -1,0 +1,26 @@
+{
+  "name": "ngx-tooltip-directives",
+  "version": "16.0.0",
+  "description": "Tooltips for Angular",
+  "author": {
+    "name": "Matthias Keller"
+  },
+  "keywords": [
+    "Angular",
+    "Angular 2",
+    "ng2",
+    "ngx",
+    "tooltip",
+    "popover"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/common": "^16.0.0",
+    "@angular/core": "^16.0.0",
+    "rxjs": "~7.8.0"
+  },
+  "dependencies": {
+    "tslib": "^2.5.0"
+  },
+  "sideEffects": false
+}
