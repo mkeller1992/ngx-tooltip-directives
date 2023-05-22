@@ -1,13 +1,17 @@
 # ngx-tooltip-directives
 
-A tooltip is a pop-up tip that appears when you hover over an item or click on it.
+This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained [ng2-tooltip-directive](https://www.npmjs.com/package/ng2-tooltip-directive).
+
+It is compatible with **Angular 16** and above.
+
+Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
 ## Demo
 Coming soon
 
 ## Setup
 
-Install the npm package.
+To install the library, enter the following command in your console:
 
     npm i ngx-tooltip-directives
         
@@ -73,12 +77,12 @@ import { TooltipModule } from 'ngx-tooltip-directives';
 
 ```ts
 myOptions: TooltipOptions = {
-    'placement': 'left',
+    'placement': 'right',
     'showDelay': 500
 }
 ```
 ```html
-<div tooltipStr="Tooltip on the left" [options]="myOptions">Show Tooltip</div>
+<div tooltipStr="Tooltip on the right" [options]="myOptions">Show Tooltip</div>
 ```
 
 
