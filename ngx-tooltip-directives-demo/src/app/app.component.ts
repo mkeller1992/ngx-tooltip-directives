@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   title = 'ngx-tooltip-directives';
   subTitle = 'Properties';
 
-  tooltipHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
+  tooltipHtml: string = '<div>This is a <strong>tooltip</strong> with HTML</div>';
   safeTooltipHtml!: SafeHtml;
 
   constructor(private sanitizer: DomSanitizer){ }

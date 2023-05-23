@@ -7,7 +7,7 @@ It is compatible with **Angular 16** and above.
 Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
 ## Demo
-Coming soon
+https://mkeller1992.github.io/ngx-tooltip-directives/
 
 ## Setup
 
@@ -15,13 +15,13 @@ To install the library, enter the following command in your console:
 
     npm i ngx-tooltip-directives
         
-Import `TooltipModule`:
+Import `NgxTooltipDirectivesModule`:
 
 ```ts
-import { TooltipModule } from 'ngx-tooltip-directives';
+import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
  
 @NgModule({
-    imports: [ TooltipModule ]
+    imports: [ NgxTooltipDirectivesModule ]
 }) 
 ```
 
@@ -35,33 +35,33 @@ import { TooltipModule } from 'ngx-tooltip-directives';
 
 2 - Pass the tooltip content as SafeHtml via `tooltipHtml`:
 
-```ts
-  import { Component, OnInit } from '@angular/core';
-  import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
-  tooltipHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
-  safeTooltipHtml!: SafeHtml;
-
-  constructor(private sanitizer: DomSanitizer){ }
-
-  ngOnInit(): void {
-    this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
-  }
-```
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
+```
+```ts
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+// Code skipped for brevity
+
+export class AppComponent {
+  rawHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
+  safeTooltipHtml: SafeHtml;
+
+  constructor(private sanitizer: DomSanitizer){ 
+    this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.rawHtml);
+  }
+}
 ```
 
 3 - Pass the tooltip content as template via `tooltipTemplate`:
 
 ```html
-<ng-template #tooltipTemplate>
-	<div style="color: blue; font-weight: bold;">
-        Tooltip Template
-	</div>
+<ng-template #myTemplate>
+  <div style="color: blue; font-weight: bold;">
+    Tooltip Template
+  </div>
 </ng-template>
 
-<div [tooltipTemplate]="tooltipTemplate" placement="right">Show Tooltip Template</div>
+<div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
 
@@ -75,14 +75,14 @@ import { TooltipModule } from 'ngx-tooltip-directives';
 
 2 - Options can be passed to the tooltips as TooltipOptions object:
 
+```html
+<div tooltipStr="Tooltip on the right" [options]="myOptions">Show Tooltip</div>
+```
 ```ts
 myOptions: TooltipOptions = {
     'placement': 'right',
     'showDelay': 500
 }
-```
-```html
-<div tooltipStr="Tooltip on the right" [options]="myOptions">Show Tooltip</div>
 ```
 
 
@@ -128,9 +128,8 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | maxWidth              | string                                | '200px' | The maximum width of the tooltip. |
 | hideDelayAfterClick   | number                                | undefined | The delay in ms before hiding the tooltip when the "click" trigger is used. |
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
-| position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |
-
-
+| position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
+   
 ## Events
 
 Events are called in accordance with the delays specified in the options within the directive. By default, there is a 300-millisecond delay before the tooltip hides.
@@ -140,9 +139,8 @@ Events are called in accordance with the delays specified in the options within 
 | {type: "show", position: DOMRect} | This event is fired prior to the tooltip's appearance. |
 | {type: "shown", position: DOMRect} | This event is fired following the tooltip's appearance animation. |
 | {type: "hide", position: DOMRect} | This event is fired prior to the tooltip being hidden. |
-| {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |
-
-
+| {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |  
+   
 ## Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.

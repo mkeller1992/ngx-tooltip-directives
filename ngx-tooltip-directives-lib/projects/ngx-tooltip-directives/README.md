@@ -55,13 +55,13 @@ export class AppComponent {
 3 - Pass the tooltip content as template via `tooltipTemplate`:
 
 ```html
-<ng-template #tooltipTemplate>
+<ng-template #myTemplate>
   <div style="color: blue; font-weight: bold;">
     Tooltip Template
   </div>
 </ng-template>
 
-<div [tooltipTemplate]="tooltipTemplate" placement="right">Show Tooltip Template</div>
+<div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
 
