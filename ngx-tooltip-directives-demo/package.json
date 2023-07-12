@@ -19,7 +19,7 @@
     "@angular/platform-browser-dynamic": "^16.0.2",
     "@angular/router": "^16.0.2",
     "angular2-draggable": "^16.0.0",
-    "ngx-tooltip-directives": "^16.0.12",
+    "ngx-tooltip-directives": "^16.1.0",
     "rxjs": "~7.8.1",
     "tslib": "^2.5.2",
     "zone.js": "~0.13.0"

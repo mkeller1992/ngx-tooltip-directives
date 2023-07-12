@@ -1,28 +1,26 @@
+
 :host {
-  max-width: 200px;
+  transform: scale(0.0);
+
+  &.show {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity var(--transition-time) linear, transform var(--transition-time) linear;
+  }
+
+  &.hide {
+      opacity: 0;
+      transform: scale(0.0);
+      transition: opacity 0.1s linear, transform 0.1s linear;
+  }
+
   text-align: center;
   border-radius: 6px;
-  padding: 5px 8px;
   position: absolute;
   pointer-events: none;
   z-index: 1100;
-  display: block;
-  opacity: 0;
-  transition: opacity 300ms;
   top: 0;
   left: 0; 
-
-  &.tooltip-show {
-    opacity: 1;
-  }
-
-  &.tooltip-hide {
-	  opacity: 0;
-  }
-
-  &.tooltip-display-none {
-	  display: none;
-  }
 
   &.tooltip-shadow {
     box-shadow: 0 7px 15px -5px rgba(0, 0, 0, 0.4);
