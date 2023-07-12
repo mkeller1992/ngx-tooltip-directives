@@ -25,7 +25,7 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
 }) 
 ```
 
-## 3 ways of passing the tooltip content
+## 3 ways of setting the tooltip content
     
 1 - Pass the tooltip text as a string via `tooltipStr`:
 
@@ -65,7 +65,7 @@ export class AppComponent {
 
 ```
 
-## 3 ways of passing tooltip options
+## 3 ways of setting tooltip options
 
 1 - Options can be set via html-attributes, so they have the highest priority:
 

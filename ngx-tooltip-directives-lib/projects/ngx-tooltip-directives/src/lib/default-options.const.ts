@@ -9,7 +9,7 @@ export const defaultOptions: TooltipOptions = {
 	backgroundColor: 'white',
 	borderColor: 'blue',
 	textAlign: 'center',
-	padding: '10px 13px',
+	padding: '5px 8px',
 	shadow: true,
 	showDelay: 0,
 	hideDelay: 300,
