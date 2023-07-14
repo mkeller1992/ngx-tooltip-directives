@@ -128,7 +128,6 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 			filter(event => event.propertyName === 'opacity' && this.tooltipState === 'show'),
-			tap(() => console.log('End showing tooltip')),
 			tap(() => this.events.emit({ type: 'shown' })),
 			takeUntil(this.destroy$),
 		  )
@@ -139,7 +138,6 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 			filter(event => event.propertyName === 'opacity' && this.tooltipState === 'hide'),
-			tap(() => console.log('End hiding tooltip')),
 			tap(() => this.events.emit({ type: 'hidden' })),
 			takeUntil(this.destroy$)
 		  )
