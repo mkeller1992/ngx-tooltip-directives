@@ -10,9 +10,7 @@ import { TooltipDto } from './tooltip.dto';
 
 export type ContentType = "string" | "html" | "template";
 
-@Directive({
-    selector: '[ttt]'
-})
+@Directive()
 
 export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 

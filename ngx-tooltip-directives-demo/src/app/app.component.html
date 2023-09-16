@@ -128,6 +128,12 @@
     <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.show()">show()</button>
     <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.hide()">hide()</button>
 
+
+    <div tooltip [tooltipStr]="'Tooltip text'" #tooltipProgrammatically="tooltipStr"></div>
+
+    <button class="btn btn-small btn-outline btn-rounded" (click)="show()">show() via component.ts</button>
+    <button class="btn btn-small btn-outline btn-rounded" (click)="hide()">hide() via component.ts</button>
+
     <hr>
 
     <h2>Events</h2>

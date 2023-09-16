@@ -65,6 +65,27 @@ export class AppComponent {
 
 ```
 
+## Trigger tooltip programmatically
+```html
+<div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
+
+<button class="btn btn-small btn-outline btn-rounded" (click)="show()">show() via component.ts</button>
+<button class="btn btn-small btn-outline btn-rounded" (click)="hide()">hide() via component.ts</button>
+```
+```ts
+@ViewChild('myTooltip')
+tooltip!: TooltipStrDirective;
+
+show() {
+  this.tooltip.show();
+}
+
+hide() {
+  this.tooltip.hide();
+}
+```
+
+
 ## 3 ways of setting tooltip options
 
 1 - Options can be set via html-attributes, so they have the highest priority:
@@ -119,7 +140,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | hideDelay             | number                                | 300     | The delay in ms before the tooltip is removed. |
 | hideDelayTouchscreen  | number                                | 0       | The delay in ms before the tooltip is hidden on mobile devices. |
 | zIndex                | number                                | 0       | The z-index of the tooltip. |
-| animationDuration     | number                                | 300     | The duration in ms that the animation takes to run from start to finish. |
+| animationDuration     | number                                | 100     | The duration in ms that the animation takes to run from start to finish. |
 | trigger               | "hover" \| "click"                    | 'hover' | Specifies how the tooltip is triggered. The closing time is controlled with "hide-delay". |
 | tooltipClass          | string                                | ''      | Any additional classes to be passed to the tooltip. |
 | display               | boolean                               | true    | If true, the tooltip is available for display. |

@@ -1,6 +1,17 @@
 
 :host {
   transform: scale(0.0);
+  text-align: center;
+  border-radius: 6px;
+  position: absolute;
+  pointer-events: none;
+  z-index: 1100;
+  top: 0;
+  left: 0;
+
+  .tooltip-label {
+    text-align: var(--tooltip-text-align);
+  }
 
   &.show {
       opacity: 1;
@@ -14,21 +25,9 @@
       transition: opacity 0.1s linear, transform 0.1s linear;
   }
 
-  text-align: center;
-  border-radius: 6px;
-  position: absolute;
-  pointer-events: none;
-  z-index: 1100;
-  top: 0;
-  left: 0; 
-
   &.tooltip-shadow {
     box-shadow: 0 7px 15px -5px rgba(0, 0, 0, 0.4);
   }
-
-  .tooltip-label {
-    text-align: var(--tooltip-text-align);
-  } 
 
   &.tooltip-clickable {
     .tooltip-label {

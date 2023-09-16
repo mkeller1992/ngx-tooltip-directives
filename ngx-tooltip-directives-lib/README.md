@@ -65,6 +65,27 @@ export class AppComponent {
 
 ```
 
+## Trigger tooltip programmatically
+```html
+<div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
+
+<button class="btn btn-small btn-outline btn-rounded" (click)="show()">show() via component.ts</button>
+<button class="btn btn-small btn-outline btn-rounded" (click)="hide()">hide() via component.ts</button>
+```
+```ts
+@ViewChild('myTooltip')
+tooltip!: TooltipStrDirective;
+
+show() {
+  this.tooltip.show();
+}
+
+hide() {
+  this.tooltip.hide();
+}
+```
+
+
 ## 3 ways of setting tooltip options
 
 1 - Options can be set via html-attributes, so they have the highest priority:

@@ -189,8 +189,14 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		const tooltipWidth = tooltip.clientWidth;
 		const scrollY = window.scrollY;
 
-		let formControlHeight = isFormCtrlSVG ? this.hostElement.getBoundingClientRect().height : this.hostElement.offsetHeight;
-		let formControlWidth = isFormCtrlSVG ? this.hostElement.getBoundingClientRect().width : this.hostElement.offsetWidth;
+		let formControlHeight = isFormCtrlSVG
+			? this.hostElement.getBoundingClientRect().height
+			: this.hostElement.offsetHeight;
+
+		let formControlWidth = isFormCtrlSVG
+			? this.hostElement.getBoundingClientRect().width
+			: this.hostElement.offsetWidth;
+
 		// In case the user passed a custom position, the object would just contain {top: number, left: number}
 		const isCustomPosition = !(this.hostElementPosition instanceof DOMRect);
 	
@@ -199,35 +205,43 @@ export class TooltipComponent implements OnInit, OnDestroy {
 			formControlWidth = 0;
 		}
 
-		let topStyle;
-		let leftStyle;
+		let topStyle, leftStyle;
 
-		if (placement === 'top' || placement === 'top-left') {
-			topStyle = (this.hostElementPosition.top + scrollY) - (tooltipHeight + this.tooltipOffset);
+		switch (placement) {
+			case 'top':
+			case 'top-left':
+				topStyle = (this.hostElementPosition.top + scrollY) - (tooltipHeight + this.tooltipOffset);
+				break;
+	
+			case 'bottom':
+			case 'bottom-left':
+				topStyle = (this.hostElementPosition.top + scrollY) + (formControlHeight + this.tooltipOffset);
+				break;
+	
+			case 'left':
+			case 'right':
+				topStyle = (this.hostElementPosition.top + scrollY) + (formControlHeight / 2) - (tooltip.clientHeight / 2);
+				break;
 		}
 
-		if (placement === 'bottom' || placement === 'bottom-left') {
-			topStyle = (this.hostElementPosition.top + scrollY) + formControlHeight + this.tooltipOffset;
-		}
-
-		if (placement === 'top' || placement === 'bottom') {
-			leftStyle = (this.hostElementPosition.left + formControlWidth / 2) - tooltipWidth / 2;
-		}
-
-		if (placement === 'bottom-left' || placement === 'top-left') {
-			leftStyle = this.hostElementPosition.left;
-		}
-
-		if (placement === 'left') {
-			leftStyle = this.hostElementPosition.left - tooltipWidth - this.tooltipOffset;
-		}
-
-		if (placement === 'right') {
-			leftStyle = this.hostElementPosition.left + formControlWidth + this.tooltipOffset;
-		}
-
-		if (placement === 'left' || placement === 'right') {
-			topStyle = (this.hostElementPosition.top + scrollY) + formControlHeight / 2 - tooltip.clientHeight / 2;
+		switch (placement) {
+			case 'top':
+			case 'bottom':
+				leftStyle = (this.hostElementPosition.left + formControlWidth / 2) - (tooltipWidth / 2);
+				break;
+	
+			case 'top-left':
+			case 'bottom-left':
+				leftStyle = this.hostElementPosition.left;
+				break;
+	
+			case 'left':
+				leftStyle = this.hostElementPosition.left - tooltipWidth - this.tooltipOffset;
+				break;
+	
+			case 'right':
+				leftStyle = this.hostElementPosition.left + formControlWidth + this.tooltipOffset;
+				break;
 		}
 
 		return {
@@ -241,19 +255,15 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		}
 	}
 
-    private isPlacementInsideVisibleArea(styleData: TooltipStyles) {
+	private isPlacementInsideVisibleArea(styleData: TooltipStyles): boolean {
 		const topEdge = styleData.topStyle - styleData.scrollY;
 		const bottomEdge = styleData.topStyle + styleData.tooltipHeight;
 		const leftEdge = styleData.leftStyle;
 		const rightEdge = styleData.leftStyle + styleData.tooltipWidth;
 		const bodyHeight = window.innerHeight + styleData.scrollY;
 		const bodyWidth = styleData.clientWidth;
-
-		if (topEdge < 0 || bottomEdge > bodyHeight || leftEdge < 0 || rightEdge > bodyWidth) {
-			return false;
-		}
-		
-		return true;				
+	
+		return topEdge >= 0 && bottomEdge <= bodyHeight && leftEdge >= 0 && rightEdge <= bodyWidth;
 	}
 
     private setCustomClass(options: TooltipOptions){
@@ -265,7 +275,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
     }
 
     private setZIndex(options: TooltipOptions): void {
-        if (options.zIndex !== 0) {
+        if (options.zIndex && options.zIndex > 0) {
             this.hostStyleZIndex = options.zIndex ?? defaultOptions.zIndex ?? 0;
         }
     }

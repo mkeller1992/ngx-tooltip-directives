@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TooltipStrDirective } from 'ngx-tooltip-directives';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 
 export class AppComponent implements OnInit {
+
+  @ViewChild('tooltipProgrammatically')
+  tooltipProgrammatically!: TooltipStrDirective;
 
   title = 'ngx-tooltip-directives';
   subTitle = 'Properties';
@@ -19,6 +23,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
+  }
+
+  show() {
+    this.tooltipProgrammatically.show();
+  }
+
+  hide() {
+    this.tooltipProgrammatically.hide();
   }
 
   handleTooltipEvents(event:string){
