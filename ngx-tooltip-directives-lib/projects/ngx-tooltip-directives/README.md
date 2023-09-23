@@ -137,7 +137,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | padding               | string                                | '10px 13px 10px 13px' | The padding around the tooltip text (top, right, bottom, left). |
 | shadow                | boolean                               | true    | If true, the tooltip will have a shadow. |
 | showDelay             | number                                | 0       | The delay in ms before the tooltip is shown. |
-| hideDelay             | number                                | 300     | The delay in ms before the tooltip is removed. |
+| hideDelay             | number                                | 0       | The delay in ms before the tooltip is removed. |
 | hideDelayTouchscreen  | number                                | 0       | The delay in ms before the tooltip is hidden on mobile devices. |
 | zIndex                | number                                | 0       | The z-index of the tooltip. |
 | animationDuration     | number                                | 100     | The duration in ms that the animation takes to run from start to finish. |

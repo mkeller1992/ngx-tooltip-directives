@@ -12,7 +12,7 @@ export const defaultOptions: TooltipOptions = {
 	padding: '5px 8px',
 	shadow: true,
 	showDelay: 0,
-	hideDelay: 300,
+	hideDelay: 0,
 	hideDelayTouchscreen: 0,
 	hideDelayAfterClick: undefined,
 	zIndex: 0,

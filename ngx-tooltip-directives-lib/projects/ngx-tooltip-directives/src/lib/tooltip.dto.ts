@@ -4,9 +4,9 @@ import { TooltipOptions } from './options.interface';
 
 
 export interface TooltipDto {
-	tooltipStr: string | undefined;
-	tooltipHtml: SafeHtml | undefined;
-	tooltipTemplate: TemplateRef<any> | undefined;
+	tooltipStr?: string;
+	tooltipHtml?: SafeHtml;
+	tooltipTemplate?: TemplateRef<any>;
 	hostElement: any;
 	hostElementPosition: { top: number, left: number } | DOMRect;
 	options: TooltipOptions;

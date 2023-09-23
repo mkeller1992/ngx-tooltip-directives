@@ -1,6 +1,6 @@
 import { ApplicationRef, ComponentRef, Directive, ElementRef, EventEmitter, Inject, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
-import { auditTime, filter, first, fromEvent, map, merge, race, Subject, switchMap, takeUntil, tap, throttleTime, timer } from 'rxjs';
+import { auditTime, EMPTY, filter, first, fromEvent, map, merge, race, Subject, switchMap, takeUntil, tap, throttleTime, timer } from 'rxjs';
 import { defaultOptions } from './default-options.const';
 import { TooltipOptions } from './options.interface';
 import { TooltipOptionsService } from './options.service';
@@ -27,7 +27,7 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
     // Will contain all options collected from the @Inputs
 	private collectedOptions: Partial<TooltipOptions> = {};
 
-        // Pass options as a single object:
+    // Pass options as a single object:
     @Input()
 	options: TooltipOptions = {};
 
@@ -194,7 +194,6 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
     private clearTimeouts$ = new Subject<void>();
 	private destroy$ = new Subject<void>();
 
-
     constructor(
         @Optional() @Inject(TooltipOptionsService) private initOptions: TooltipOptions,
         private hostElementRef: ElementRef,
@@ -216,8 +215,10 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 		// On click on input-field: Hide tooltip
 		this.listenToClickOnHostElement();
 
-        this.listenToMouseEnterAndFocusIn();
-        this.listenToMouseLeaveAndFocusOut();
+        // this.listenToMouseEnterAndFocusIn();
+        // this.listenToMouseLeaveAndFocusOut();
+
+        this.listenToInteractions();
 
 		// The tooltip-position needs to be adjusted when user scrolls or resizes the window:
 		this.listenToScrollAndResizeEvents();    
@@ -298,7 +299,8 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
             .subscribe();
 	}
 
-    /* Listens to mouse-enter and focus-in on the host-element */
+/*
+    // Listens to mouse-enter and focus-in on the host-element
     private listenToMouseEnterAndFocusIn() {
         const mouseEnter$ = fromEvent(this.hostElementRef.nativeElement, 'mouseenter');
         const focusIn$ = fromEvent(this.hostElementRef.nativeElement, 'focusin');
@@ -308,37 +310,104 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
             filter(() => this.isDisplayOnHover),
             tap(() => this.clearTimeouts$.next()),
             switchMap(() => {
-                const obsShowTooltipAfterDelay = timer(this.mergedOptions.showDelay ?? 0)
-                                                    .pipe(tap(() => this.show()));  
                 // Make delay cancellable:                
-                // Executes obsHideTooltipAfterDelay, given clearTimeouts$ isn't called before hideDelay has elapsed:
-                return race(obsShowTooltipAfterDelay, this.clearTimeouts$);
+                // Executes this.show(), given clearTimeouts$ wasn't called before showDelay has elapsed:
+                const obsShowTooltipAfterDelay = timer(this.mergedOptions.showDelay ?? 0)
+                    .pipe(
+                        takeUntil(this.clearTimeouts$),
+                        tap(() => this.show())
+                    );  
+                return obsShowTooltipAfterDelay;
             }),
             takeUntil(this.destroy$)
           )
           .subscribe();
     }
 
-    /* Listens to mouse-leave and focus-out on the host-element */
+
+    // Listens to mouse-leave and focus-out on the host-element
     private listenToMouseLeaveAndFocusOut() {
         const mouseLeave$ = fromEvent(this.hostElementRef.nativeElement, 'mouseleave');
         const focusOut$ = fromEvent(this.hostElementRef.nativeElement, 'focusout');
       
         merge(mouseLeave$, focusOut$)
-          .pipe(
-            filter(() => this.isDisplayOnHover),
-            tap(() => this.clearTimeouts$.next()),
-            switchMap(() => {
-                const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelay ?? 0)
-                                                    .pipe(tap(() => this.hideTooltip()));  
-                // Make delay cancellable:                
-                // Executes obsHideTooltipAfterDelay, given clearTimeouts$ isn't called before hideDelay has elapsed:
-                return race(obsHideTooltipAfterDelay, this.clearTimeouts$);
-            }),
-            takeUntil(this.destroy$)
-          )
-          .subscribe();
+            .pipe(
+                filter(() => this.isDisplayOnHover),
+                tap(() => this.clearTimeouts$.next()),
+                switchMap(() => {
+                    // Make delay cancellable:
+                    // Executes this.hideTooltip(), given clearTimeouts$ wasn't called before hideDelay has elapsed:
+                    const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelay ?? 0)
+                        .pipe(
+                            takeUntil(this.clearTimeouts$),
+                            tap(() => this.hideTooltip())
+                        );  
+                    return obsHideTooltipAfterDelay;
+                }),
+                takeUntil(this.destroy$)
+            )
+            .subscribe();
+        }
+*/
+
+
+    private lastMousePosition: { x: number, y: number } | null = null;
+
+    private listenToInteractions() {
+        const mouseMove$ = fromEvent<MouseEvent>(document, 'mousemove');
+        const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
+        const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
+        const scroll$ = fromEvent(document, 'scroll');
+        const resize$ = fromEvent(window, 'resize');
+
+        merge(mouseMove$, focusIn$, focusOut$, scroll$, resize$)
+            .pipe(
+                filter(() => this.isDisplayOnHover),
+                switchMap(event => {
+                    if (event instanceof MouseEvent) {
+                        this.lastMousePosition = { x: event.clientX, y: event.clientY };
+                    }
+    
+                    const isMouseOverElement = this.isMouseOverElement(this.lastMousePosition, this.hostElementRef.nativeElement);
+
+                    if (!this.isTooltipVisible && isMouseOverElement) {
+                        this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
+                        const obsShowTooltipAfterDelay = timer(this.mergedOptions.showDelay ?? 0)
+                            .pipe(
+                                takeUntil(this.clearTimeouts$),
+                                tap(() => this.show())
+                            );
+                        return obsShowTooltipAfterDelay;
+                    }
+                    else if (this.isTooltipVisible && !isMouseOverElement) {
+                        this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
+                        const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelay ?? 0)
+                            .pipe(
+                                takeUntil(this.clearTimeouts$),
+                                tap(() => this.hideTooltip())
+                            );
+                        return obsHideTooltipAfterDelay;
+                    }
+                    return EMPTY;  // Returns an empty observable when no action is needed
+                }),
+                takeUntil(this.destroy$)
+            )
+            .subscribe();
     }
+
+
+    private isMouseOverElement(position: { x: number, y: number } | null, element: Element): boolean {
+        if (!position){ 
+            return false;
+        }
+
+        const rect = element.getBoundingClientRect();
+        return position.x >= rect.left
+            && position.x <= rect.right
+            && position.y >= rect.top
+            && position.y <= rect.bottom;
+    }
+
 
     /* The tooltip-position needs to be adjusted when user scrolls or resizes the window */
 	private listenToScrollAndResizeEvents() {
