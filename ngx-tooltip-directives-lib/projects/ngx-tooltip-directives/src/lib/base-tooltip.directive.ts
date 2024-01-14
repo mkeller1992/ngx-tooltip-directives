@@ -353,7 +353,7 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 
     private lastMousePosition: { x: number, y: number } | null = null;
 
-    private listenToInteractions() {
+    listenToInteractions() {
         const mouseMove$ = fromEvent<MouseEvent>(document, 'mousemove');
         const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
         const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
@@ -372,21 +372,11 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 
                     if (!this.isTooltipVisible && isMouseOverElement) {
                         this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
-                        const obsShowTooltipAfterDelay = timer(this.mergedOptions.showDelay ?? 0)
-                            .pipe(
-                                takeUntil(this.clearTimeouts$),
-                                tap(() => this.show())
-                            );
-                        return obsShowTooltipAfterDelay;
+                        return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
                     }
                     else if (this.isTooltipVisible && !isMouseOverElement) {
                         this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
-                        const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelay ?? 0)
-                            .pipe(
-                                takeUntil(this.clearTimeouts$),
-                                tap(() => this.hideTooltip())
-                            );
-                        return obsHideTooltipAfterDelay;
+                        return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
                     }
                     return EMPTY;  // Returns an empty observable when no action is needed
                 }),
@@ -395,6 +385,21 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
             .subscribe();
     }
 
+    showTooltipAfterDelay(delayInMillis: number) {
+        return timer(delayInMillis)
+            .pipe(
+                takeUntil(this.clearTimeouts$),
+                tap(() => this.show())
+            );
+    }
+
+    hideTooltipAfterDelay(delayInMillis: number) {
+        return timer(delayInMillis)
+            .pipe(
+                takeUntil(this.clearTimeouts$),
+                tap(() => this.hideTooltip())
+            );
+    }
 
     private isMouseOverElement(position: { x: number, y: number } | null, element: Element): boolean {
         if (!position){ 
