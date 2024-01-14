@@ -1,6 +1,6 @@
 {
   "name": "ngx-tooltip-directives",
-  "version": "16.1.2",
+  "version": "17.0.0",
   "description": "Tooltips for Angular",
   "homepage": "https://mkeller1992.github.io/ngx-tooltip-directives",
   "repository": {
@@ -23,12 +23,12 @@
     "url": "https://github.com/mkeller1992/ngx-tooltip-directives/issues"
   },
   "peerDependencies": {
-    "@angular/common": "^16.0.0",
-    "@angular/core": "^16.0.0",
+    "@angular/common": "^17.0.0",
+    "@angular/core": "^17.0.0",
     "rxjs": "~7.8.0"
   },
   "dependencies": {
-    "tslib": "^2.5.0"
+    "tslib": "^2.6.0"
   },
   "sideEffects": false
 }
