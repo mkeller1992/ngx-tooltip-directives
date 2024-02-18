@@ -22,20 +22,20 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "paths": {
+      "@ngx-tooltip-directives": [
+        "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
+      ],
+      "@angular/*": [
+        "./node_modules/@angular/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
-  "paths": {
-    "@ngx-everything-uppercase": [
-      "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
-    ],
-    "@angular/*": [
-      "./node_modules/@angular/*"
-    ]
-  },
+  }
 }

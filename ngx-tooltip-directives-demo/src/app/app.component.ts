@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TooltipStrDirective } from 'ngx-tooltip-directives';
+import { TooltipStrDirective } from '@ngx-tooltip-directives';
 
 @Component({
   selector: 'app-root',
