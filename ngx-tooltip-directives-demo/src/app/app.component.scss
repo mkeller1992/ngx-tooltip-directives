@@ -172,3 +172,9 @@ $light-shadow: rgba(0, 0, 0, 0.15);
     background: none;
   }
 }
+
+::ng-deep .tooltip.custom-class {
+  font-weight: bold;
+  font-size: 18px;
+  color: blue !important;
+}

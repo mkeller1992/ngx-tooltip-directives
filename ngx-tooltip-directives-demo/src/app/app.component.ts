@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TooltipStrDirective } from '@ngx-tooltip-directives';
+import packageJson from '../../package.json';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,8 @@ export class AppComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer){ }
 
   ngOnInit(): void {
+    console.log(`Frontend Version: v${packageJson?.version}`);
+
     this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
   }
 
