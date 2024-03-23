@@ -170,3 +170,27 @@ If you have defined the directive options, these will be taken into consideratio
 |------------------|---------------------------------------------------------------------------------------------|
 | show()           | Displays the tooltip. |
 | hide()           | Hides the tooltip. |
+
+## Testing with NgxTooltipDirectives
+
+For easier unit testing of components that use `NgxTooltipDirectives`, we provide a set of mock directives and a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing instead on the component logic.
+
+### Using the Mock Module
+
+Import `MockNgxTooltipDirectivesModule` in your test suite's TestBed configuration:
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+import { MockNgxTooltipDirectivesModule } from '@ngx-tooltip-directives';
+
+describe('AppComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AppComponent],
+      imports: [MockNgxTooltipDirectivesModule]
+    }).compileComponents();
+  });
+
+  // Your tests here
+});
