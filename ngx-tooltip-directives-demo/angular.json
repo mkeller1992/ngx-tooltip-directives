@@ -79,6 +79,9 @@
           "options": {
             "buildTarget": "ngx-tooltip-directives-demo:build"
           }
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run"
         }
       }
     }
