@@ -6,8 +6,12 @@ It is compatible with **Angular 17** and above.
 
 Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
+---
+
 ## Demo
 https://mkeller1992.github.io/ngx-tooltip-directives/
+
+---
 
 ## Setup
 
@@ -24,6 +28,8 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
     imports: [ NgxTooltipDirectivesModule ]
 }) 
 ```
+
+---
 
 ## 3 ways of setting the tooltip content
     
@@ -64,6 +70,7 @@ export class AppComponent {
 <div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
+---
 
 ## Trigger tooltip programmatically
 ```html
@@ -85,6 +92,7 @@ hide() {
 }
 ```
 
+---
 
 ## 3 ways of setting tooltip options
 
@@ -122,6 +130,8 @@ const myDefaultTooltipOptions: TooltipOptions = {
 })
 ```
 
+---
+
 ## Properties
 
 | name                  | type                                  | default | description |
@@ -142,7 +152,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | zIndex                | number                                | 0       | The z-index of the tooltip. |
 | animationDuration     | number                                | 100     | The duration in ms that the animation takes to run from start to finish. |
 | trigger               | "hover" \| "click"                    | 'hover' | Specifies how the tooltip is triggered. The closing time is controlled with "hide-delay". |
-| tooltipClass          | string                                | ''      | Any additional classes to be passed to the tooltip. |
+| tooltipClass          | string                                | ''      | Any additional classes to be passed to the tooltip (target them with `::ng-deep`). |
 | display               | boolean                               | true    | If true, the tooltip is available for display. |
 | displayTouchscreen    | boolean                               | true    | If true, the tooltip will be displayed on mobile devices. |
 | offset                | number                                | 8       | The offset of the tooltip relative to the item. |
@@ -151,6 +161,8 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
 | position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
    
+---
+
 ## Events
 
 Events are called in accordance with the delays specified in the options within the directive. By default, there is a 300-millisecond delay before the tooltip hides.
@@ -161,7 +173,9 @@ Events are called in accordance with the delays specified in the options within 
 | {type: "shown", position: DOMRect} | This event is fired following the tooltip's appearance animation. |
 | {type: "hide", position: DOMRect} | This event is fired prior to the tooltip being hidden. |
 | {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |  
-   
+
+---
+
 ## Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.
@@ -170,6 +184,8 @@ If you have defined the directive options, these will be taken into consideratio
 |------------------|---------------------------------------------------------------------------------------------|
 | show()           | Displays the tooltip. |
 | hide()           | Hides the tooltip. |
+
+---
 
 ## Testing with NgxTooltipDirectives
 
