@@ -1,0 +1,108 @@
+name: Deploy Angular Project to GitHub
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEMO_APP_FOLDER_NAME: ngx-tooltip-directives-demo
+      DEMO_PROJECT_NAME: ngx-tooltip-directives-demo
+      LIB_FOLDER_NAME: ngx-tooltip-directives-lib
+      LIB_NAME: ngx-tooltip-directives
+    steps:
+      - name: Set TARGET_BRANCH variable
+        run: echo "TARGET_BRANCH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Identify and set the latest 'v'-prefixed tag from the specified branch
+        run: |
+          # Fetch the specified branch
+          git fetch --prune --unshallow -v origin ${{ env.TARGET_BRANCH }}
+          
+          # Fetch all tags
+          git fetch --depth=1 -v origin +refs/tags/*:refs/tags/* --tags
+
+          # Filter tags that start with 'v', sort them, and get the latest
+          LATEST_DEPLOYED_VERSION=$(git tag -l "v*" | sort -V | tail -n1)
+          LATEST_DEPLOYED_VERSION=${LATEST_DEPLOYED_VERSION#v} # Remove the 'v' prefix if needed
+          echo "Latest Deployed Version: $LATEST_DEPLOYED_VERSION"
+          echo "LATEST_DEPLOYED_VERSION=${LATEST_DEPLOYED_VERSION}" >> $GITHUB_ENV
+
+      - name: Build and link mk-magic-alerts
+        run: |
+          (cd ./${{ env.LIB_FOLDER_NAME }} && npm install && npm run build && npm link)
+          (cd ./${{ env.DEMO_APP_FOLDER_NAME }} && npm link ${{ env.LIB_NAME }})
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
+
+      - name: Run Tests
+        run: npm run test:ci
+        working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
+
+      - name: Check if Deployment is Needed
+        id: version_check
+        run: |
+          # Extract the current version from package.json
+          PACKAGE_NAME=$(jq -r '.name' package.json)
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+      
+          # Fetch tags, filter those ending with '-demo', and extract the version part
+          git fetch --prune --unshallow origin +refs/tags/*:refs/tags/* --tags
+          TAGS_WITH_DEMO=$(git tag -l "v*-demo")
+          LATEST_DEPLOYED_VERSION_WITH_DEMO=$(echo "$TAGS_WITH_DEMO" | sort -V | tail -n1)
+
+          # Remove prefix 'v' and suffix '-demo' for comparison
+          LATEST_DEPLOYED_VERSION=${LATEST_DEPLOYED_VERSION_WITH_DEMO%-demo}          
+          LATEST_DEPLOYED_VERSION=${LATEST_DEPLOYED_VERSION#v}
+          
+          echo "Latest Deployed Version for comparison: $LATEST_DEPLOYED_VERSION"
+          
+          # Use sort to compare semantic versions, and consider deployment if the current is newer
+          if [ -z "$LATEST_DEPLOYED_VERSION" ] || [ "$(printf '%s\n' "$LATEST_DEPLOYED_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" != "$CURRENT_VERSION" ]; then
+            echo "Version $CURRENT_VERSION is new or no '-demo' tags found. Proceeding with publish..."
+            echo "deploy_needed=true" >> $GITHUB_ENV
+          else
+            echo "The current version is not newer; no deployment needed."
+            echo "deploy_needed=false" >> $GITHUB_ENV
+          fi
+        working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Angular Project
+        if: env.deploy_needed == 'true'
+        run: npm run deploy
+        working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
+        
+      - name: Deploy to GitHub Pages
+        if: env.deploy_needed == 'true'
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          branch: gh-pages
+          folder: ${{ env.DEMO_APP_FOLDER_NAME }}/dist/${{ env.DEMO_PROJECT_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '🚀 v${{ env.CURRENT_VERSION }} deployed to GitHub Pages'
+      
+      - name: Set a tag of the form 'v-0.0.0-demo' on the specified branch
+        if: env.deploy_needed == 'true' && success()
+        run: |
+          # Set a tag preceding a 'v' on the specified branch
+          git tag v${{ env.CURRENT_VERSION }}-demo
+          git push origin v${{ env.CURRENT_VERSION }}-demo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
