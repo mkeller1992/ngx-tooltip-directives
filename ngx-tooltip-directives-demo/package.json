@@ -6,7 +6,9 @@
     "start": "ng serve --port 4205",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:ci": "jest --runInBand",
     "deploy": "ng build --configuration=production --base-href \"/ngx-tooltip-directives/\" && node copyIndexTo404.js"
   },
   "private": true,
