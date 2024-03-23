@@ -1,0 +1,83 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    # Set all constants here
+    env:      
+      BASE_DIR: ./ngx-tooltip-directives-lib
+      PROJECT_NAME: ngx-tooltip-directives
+      # 1.) Register TOKEN on npm-website: Access Tokens > Generate New Token > Classic Token > Automation
+      # 2.) Store it on GitHub-website: repository > Settings > Secrets and variables > New repository secret
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_FOR_TOOLTIP_LIB }}
+    steps:
+      # Checkout the repository to the runner
+      - uses: actions/checkout@v4
+
+      # Install jq tool for JSON processing
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      # Setup Node.js environment
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Install dependencies at the root level
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ${{ env.BASE_DIR }}
+
+      # Run tests at the root level
+      - name: Run Tests
+        run: npm run test:ci
+        working-directory: ${{ env.BASE_DIR }}
+
+      # Build the library from the specified subdirectory
+      - name: Build Library
+        run: npx ng build
+        working-directory: ${{ env.BASE_DIR }}/projects/${{ env.PROJECT_NAME }}
+
+      # Check if version has been updated
+      - name: Check if version has been updated
+        id: check_version
+        run: |
+          # Extract the current version from package.json
+          PACKAGE_NAME=$(jq -r '.name' package.json)
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+          LATEST_PUBLISHED_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
+          if [ "$CURRENT_VERSION" = "$LATEST_PUBLISHED_VERSION" ]; then
+            echo "Version $CURRENT_VERSION is already published. Skipping publish..."
+            echo "execute_publish=false" >> $GITHUB_ENV
+          else
+            echo "Version $CURRENT_VERSION is new. Proceeding with publish..."
+            echo "execute_publish=true" >> $GITHUB_ENV
+          fi
+        working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
+
+      # Publish the library to npm if the version has been updated      
+      - name: Publish to npm
+        if: env.execute_publish == 'true'
+        run: npm publish
+        working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
+
+      # Set a version-tag for the deployed commit
+      - name: Set a version-tag for the commit to the specified branch
+        if: env.execute_publish == 'true' && success()
+        run: |
+          # Set a tag of the form 'v-0.0.0-lib' on the specified branch
+          git tag v${{ env.CURRENT_VERSION }}-lib
+          git push origin v${{ env.CURRENT_VERSION }}-lib
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
