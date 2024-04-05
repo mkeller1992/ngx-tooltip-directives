@@ -12,7 +12,7 @@ export class TooltipHtmlDirective extends BaseTooltipDirective {
     
     @Input()
     set tooltipHtml(value: SafeHtml) {
-        super.initializeTooltip(value, 'html');
+        super.setTooltipContent(value, 'html');
     }
 
 }

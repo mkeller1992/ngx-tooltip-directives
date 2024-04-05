@@ -12,7 +12,7 @@ export type ContentType = "string" | "html" | "template";
 
 @Directive()
 
-export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
+export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestroy {
 
     // Will be populated by child-directive
     tooltipContent!: string | SafeHtml | TemplateRef<any>;
@@ -202,26 +202,11 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
         private injector: Injector) {}
 
 
-    /* Will be called from child-directive */
-
-    initializeTooltip(tooltipContent: string | SafeHtml | TemplateRef<any>, contentType: ContentType) {
-        // Set user-inputs:
-        this.tooltipContent = tooltipContent;
-        this.collectedOptions.contentType = contentType;
-
+    ngOnInit(): void {
         // Map tooltip options:
         this.mergedOptions = this.getMergedTooltipOptions();
-
-		// On click on input-field: Hide tooltip
-		this.listenToClickOnHostElement();
-
-        // this.listenToMouseEnterAndFocusIn();
-        // this.listenToMouseLeaveAndFocusOut();
-
-        this.listenToInteractions();
-
-		// The tooltip-position needs to be adjusted when user scrolls or resizes the window:
-		this.listenToScrollAndResizeEvents();    
+        // Initialize listeners that capture mouse-, click- and scroll-events
+        this.initializeListeners();
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -229,9 +214,30 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
         this.mergedOptions = this.getMergedTooltipOptions();
     }
 
+    /* Will be called from child-directive */
+
+    setTooltipContent(tooltipContent: string | SafeHtml | TemplateRef<any>, contentType: ContentType) {
+        // Set user-inputs:
+        this.tooltipContent = tooltipContent;
+        this.collectedOptions.contentType = contentType;
+    }
+
+    private initializeListeners() {
+        if (this.isDisplayOnClick) {
+            this.listenToClickOnHostElement();
+        }
+
+        if (this.isDisplayOnHover) {
+            this.listenToInteractions();
+        }
+
+        // The tooltip-position needs to be adjusted when user resizes the window:
+        this.listenToResizeEvents();
+    }
+
     /* Public methods for library-users */
 
-	public show() {
+	show() {
 		if (this.tooltipContent && this.contentType) {
 
             if (this.tooltipComponent && !this.isTooltipComponentDestroyed) {
@@ -243,7 +249,7 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
         }
 	}
 
-	public hide() {
+	hide() {
         if (this.isTooltipVisible) {
             this.hideTooltip();
         }
@@ -282,10 +288,9 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
                         return true;
                     }
                 }),
-                filter(isAboutToDisplayTooltip =>
-                             isAboutToDisplayTooltip && 
-                             !!this.mergedOptions.hideDelayAfterClick &&
-                             this.mergedOptions.hideDelayAfterClick > 0),
+                filter((isAboutToDisplayTooltip: boolean) => isAboutToDisplayTooltip && 
+                                                             !!this.mergedOptions.hideDelayAfterClick &&
+                                                             this.mergedOptions.hideDelayAfterClick > 0),
                 // Cancel pipe when further clicks on the host-element are made:
                 switchMap(() => {
                     const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelayAfterClick ?? 0)
@@ -299,82 +304,26 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
             .subscribe();
 	}
 
-/*
-    // Listens to mouse-enter and focus-in on the host-element
-    private listenToMouseEnterAndFocusIn() {
-        const mouseEnter$ = fromEvent(this.hostElementRef.nativeElement, 'mouseenter');
-        const focusIn$ = fromEvent(this.hostElementRef.nativeElement, 'focusin');
-      
-        merge(mouseEnter$, focusIn$)
-          .pipe(
-            filter(() => this.isDisplayOnHover),
-            tap(() => this.clearTimeouts$.next()),
-            switchMap(() => {
-                // Make delay cancellable:                
-                // Executes this.show(), given clearTimeouts$ wasn't called before showDelay has elapsed:
-                const obsShowTooltipAfterDelay = timer(this.mergedOptions.showDelay ?? 0)
-                    .pipe(
-                        takeUntil(this.clearTimeouts$),
-                        tap(() => this.show())
-                    );  
-                return obsShowTooltipAfterDelay;
-            }),
-            takeUntil(this.destroy$)
-          )
-          .subscribe();
-    }
-
-
-    // Listens to mouse-leave and focus-out on the host-element
-    private listenToMouseLeaveAndFocusOut() {
-        const mouseLeave$ = fromEvent(this.hostElementRef.nativeElement, 'mouseleave');
-        const focusOut$ = fromEvent(this.hostElementRef.nativeElement, 'focusout');
-      
-        merge(mouseLeave$, focusOut$)
-            .pipe(
-                filter(() => this.isDisplayOnHover),
-                tap(() => this.clearTimeouts$.next()),
-                switchMap(() => {
-                    // Make delay cancellable:
-                    // Executes this.hideTooltip(), given clearTimeouts$ wasn't called before hideDelay has elapsed:
-                    const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelay ?? 0)
-                        .pipe(
-                            takeUntil(this.clearTimeouts$),
-                            tap(() => this.hideTooltip())
-                        );  
-                    return obsHideTooltipAfterDelay;
-                }),
-                takeUntil(this.destroy$)
-            )
-            .subscribe();
-        }
-*/
-
-
-    private lastMousePosition: { x: number, y: number } | null = null;
-
-    listenToInteractions() {
-        const mouseMove$ = fromEvent<MouseEvent>(document, 'mousemove');
+    private listenToInteractions() {
+        const mouseEnter$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseenter');
+        const mouseLeave$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseleave');        
         const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
         const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
         const scroll$ = fromEvent(document, 'scroll');
-        const resize$ = fromEvent(window, 'resize');
 
-        merge(mouseMove$, focusIn$, focusOut$, scroll$, resize$)
+        merge(mouseEnter$, mouseLeave$, focusIn$, focusOut$, scroll$)
             .pipe(
-                filter(() => this.isDisplayOnHover),
-                switchMap(event => {
-                    if (event instanceof MouseEvent) {
-                        this.lastMousePosition = { x: event.clientX, y: event.clientY };
-                    }
-    
-                    const isMouseOverElement = this.isMouseOverElement(this.lastMousePosition, this.hostElementRef.nativeElement);
+                filter((event) => this.isDisplayOnHover && (event instanceof MouseEvent || event.type === 'scroll')),
+                switchMap((event: Event) => {
 
-                    if (!this.isTooltipVisible && isMouseOverElement) {
+                    if (event.type === 'mouseenter' || event.type === 'focusin') {
                         this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
                         return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
                     }
-                    else if (this.isTooltipVisible && !isMouseOverElement) {
+                    else if (event.type === 'mouseleave' ||
+                             event.type === 'focusout' ||
+                             (this.isTooltipVisible && event.type === 'scroll')) {
+
                         this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
                         return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
                     }
@@ -385,41 +334,12 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
             .subscribe();
     }
 
-    showTooltipAfterDelay(delayInMillis: number) {
-        return timer(delayInMillis)
-            .pipe(
-                takeUntil(this.clearTimeouts$),
-                tap(() => this.show())
-            );
-    }
 
-    hideTooltipAfterDelay(delayInMillis: number) {
-        return timer(delayInMillis)
-            .pipe(
-                takeUntil(this.clearTimeouts$),
-                tap(() => this.hideTooltip())
-            );
-    }
-
-    private isMouseOverElement(position: { x: number, y: number } | null, element: Element): boolean {
-        if (!position){ 
-            return false;
-        }
-
-        const rect = element.getBoundingClientRect();
-        return position.x >= rect.left
-            && position.x <= rect.right
-            && position.y >= rect.top
-            && position.y <= rect.bottom;
-    }
-
-
-    /* The tooltip-position needs to be adjusted when user scrolls or resizes the window */
-	private listenToScrollAndResizeEvents() {
-		const scroll$ = fromEvent(window, 'scroll');
+    /* The tooltip-position needs to be adjusted when user resizes the window */
+	private listenToResizeEvents() {
 		const resize$ = fromEvent(window, 'resize');
 
-		merge(scroll$, resize$)
+		merge(resize$)
 			.pipe(
 				// For 'auditTime' check the following stackoverflow-article:
 				// 'Rxjs: How to use bufferTime while only triggering an emission when new values have arrived'
@@ -436,8 +356,7 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 			.subscribe();
 	}
 
-
-	private createTooltip() {
+    private createTooltip() {
 		// Stop all ongoing processes:
 		this.clearTimeouts$.next();
 
@@ -454,6 +373,22 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
 			.subscribe();
 	}
 
+    private showTooltipAfterDelay(delayInMillis: number) {
+        return timer(delayInMillis)
+            .pipe(
+                takeUntil(this.clearTimeouts$),
+                tap(() => this.show())
+            );
+    }
+
+    private hideTooltipAfterDelay(delayInMillis: number) {
+        return timer(delayInMillis)
+            .pipe(
+                takeUntil(this.clearTimeouts$),
+                tap(() => this.hideTooltip())
+            );
+    }
+
     private appendComponentToBody(): void {
         // Create the component using the ViewContainerRef.
         // This way the component is automatically added to the change detection cycle of the Angular application
@@ -461,7 +396,9 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
         this.tooltipComponent = this.refToTooltipComponent.instance;
 
         // Attach tooltip-click listener:
-		this.listenToClicksOnTooltip(this.tooltipComponent);
+        if (this.isDisplayOnClick) {
+            this.listenToClicksOnTooltip(this.tooltipComponent);
+        }
 
 		if(!this.tooltipComponent) { return; }     
       
@@ -475,7 +412,7 @@ export abstract class BaseTooltipDirective implements OnChanges, OnDestroy {
     	this.tooltipComponent?.events
 			.pipe(
 				takeUntil(this.destroy$),
-				tap((eventType) => {
+				tap(eventType => {
 					eventType === 'shown' && this.events.emit({ type: 'shown', position: this.hostElementPosition });
 					eventType === 'hidden' && this.events.emit({ type: 'hidden', position: this.hostElementPosition });
 				})

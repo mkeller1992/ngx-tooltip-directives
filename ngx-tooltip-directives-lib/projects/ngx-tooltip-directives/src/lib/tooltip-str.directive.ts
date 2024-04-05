@@ -10,7 +10,7 @@ export class TooltipStrDirective extends BaseTooltipDirective {
     
     @Input()
     set tooltipStr(value: string) {
-        super.initializeTooltip(value, 'string');
+        super.setTooltipContent(value, 'string');
     }
 
 }

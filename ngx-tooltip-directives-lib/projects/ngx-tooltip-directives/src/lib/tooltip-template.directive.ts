@@ -10,7 +10,7 @@ export class TooltipTemplateDirective extends BaseTooltipDirective {
     
     @Input()
     set tooltipTemplate(value: TemplateRef<any>) {
-        super.initializeTooltip(value, 'template');
+        super.setTooltipContent(value, 'template');
     }
 
 }
