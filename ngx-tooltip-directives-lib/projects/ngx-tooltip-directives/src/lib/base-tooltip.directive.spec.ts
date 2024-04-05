@@ -46,7 +46,7 @@ class HostComponent {}
       const directiveInstance = directiveWithTooltipStr.injector.get(TooltipStrDirective);
   
       // Spy on the initializeTooltip method of the BaseTooltipDirective
-      const initializeTooltipSpy = jest.spyOn(BaseTooltipDirective.prototype, 'initializeTooltip');
+      const initializeTooltipSpy = jest.spyOn(BaseTooltipDirective.prototype, 'setTooltipContent');
   
       // Set the tooltipStr input property
       directiveInstance.tooltipStr = 'Test Tooltip String';
