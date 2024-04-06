@@ -40,7 +40,7 @@ jobs:
           echo "Latest Deployed Version: $LATEST_DEPLOYED_VERSION"
           echo "LATEST_DEPLOYED_VERSION=${LATEST_DEPLOYED_VERSION}" >> $GITHUB_ENV
 
-      - name: Build and link mk-magic-alerts
+      - name: Build and link ngx-tooltip-directives
         run: |
           (cd ./${{ env.LIB_FOLDER_NAME }} && npm install && npm run build && npm link)
           (cd ./${{ env.DEMO_APP_FOLDER_NAME }} && npm link ${{ env.LIB_NAME }})
