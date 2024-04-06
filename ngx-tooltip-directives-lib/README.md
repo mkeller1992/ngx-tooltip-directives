@@ -1,6 +1,11 @@
 # ngx-tooltip-directives
 
-This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained [ng2-tooltip-directive](https://www.npmjs.com/package/ng2-tooltip-directive).
+---
+[![npm version](https://badge.fury.io/js/ngx-tooltip-directives.svg)](https://badge.fury.io/js/ngx-tooltip-directives)
+![build status](https://github.com/mkeller1992/ngx-tooltip-directives/actions/workflows/npm-publish.yml/badge.svg)
+[![codecov](https://codecov.io/gh/mkeller1992/ngx-tooltip-directives/graph/badge.svg?token=DNQ72Y4VCW)](https://codecov.io/gh/mkeller1992/ngx-tooltip-directives)
+
+This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained ng2-tooltip-directive.
 
 It is compatible with **Angular 17** and above.
 
