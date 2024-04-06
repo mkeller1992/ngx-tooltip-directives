@@ -1,6 +1,5 @@
 # ngx-tooltip-directives
 
----
 [![npm version](https://badge.fury.io/js/ngx-tooltip-directives.svg)](https://badge.fury.io/js/ngx-tooltip-directives)
 ![build status](https://github.com/mkeller1992/ngx-tooltip-directives/actions/workflows/npm-publish.yml/badge.svg)
 [![codecov](https://codecov.io/gh/mkeller1992/ngx-tooltip-directives/graph/badge.svg?token=DNQ72Y4VCW)](https://codecov.io/gh/mkeller1992/ngx-tooltip-directives)
