@@ -18,6 +18,7 @@ module.exports = {
       '!<rootDir>/projects/ngx-tooltip-directives/src/public-api.ts',
       '!<rootDir>/projects/ngx-tooltip-directives/src/lib/*.module.ts', // Exclude module files
       '!<rootDir>/projects/ngx-tooltip-directives/src/**/*.spec.ts', // Exclude test files
+      '!<rootDir>/projects/ngx-tooltip-directives/src/lib/mocks/mock-ngx-tooltip-directives.module.ts',
     ],
-    coverageReporters: ['html', 'text-summary', 'lcov'],
+    coverageReporters: ['html', 'text', 'text-summary', 'lcov'],
 };
