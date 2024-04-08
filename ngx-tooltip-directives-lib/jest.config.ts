@@ -1,6 +1,7 @@
 
 module.exports = {
     preset: 'jest-preset-angular',
+    testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/projects/ngx-tooltip-directives/src/jest.setup.ts'],
     testPathIgnorePatterns: [
       '<rootDir>/node_modules/',
