@@ -437,10 +437,16 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
                 options: this.mergedOptions
             };
 
-			this.tooltipComponent.showTooltip(tooltipData);
+			this.triggerShowTooltipOnHostComponent(tooltipData);
 			this.isTooltipVisible = true;
 		}
 	}
+
+    private triggerShowTooltipOnHostComponent(tooltipData: TooltipDto) {
+        if (this.tooltipComponent) {
+            this.tooltipComponent.showTooltip(tooltipData);
+        }
+    }
 
 	private hideTooltip(): void {
 		// Make sure no hiding-processes are ongoing:
@@ -450,10 +456,16 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
 			this.events.emit({ type: 'hide', position: this.hostElementPosition });
 
-			this.tooltipComponent?.hideTooltip();
+			this.triggerHideTooltipOnHostComponent();
 			this.isTooltipVisible = false;
     	}
 	}
+
+    private triggerHideTooltipOnHostComponent() {
+        if (this.tooltipComponent) {
+            this.tooltipComponent?.hideTooltip();
+        }
+    }
 
 	private destroyTooltip(): void {
 		this.clearTimeouts$?.next();
