@@ -5,7 +5,8 @@ import { BaseTooltipDirective } from './base-tooltip.directive';
 import { TooltipStrDirective } from './tooltip-str.directive';
 import { TooltipHtmlDirective } from './tooltip-html.directive';
 import { TooltipComponent } from './tooltip.component';
-import { TooltipOptions } from 'ngx-tooltip-directives';
+import { TooltipOptions } from './options.interface';
+
   
   describe('BaseTooltipDirective', () => {
     let fixtureStrTooltip: ComponentFixture<HostWithStrTooltipComponent>;
