@@ -5,7 +5,7 @@ module.exports = {
     coverageDirectory: 'coverage',
     collectCoverageFrom: [
       '<rootDir>/src/app/*.{ts,js}',
-      '!<rootDir>/src/app/*.module.ts', // Exclude module files
+      '!<rootDir>/src/app/*.routes.ts', // Exclude route-files
     ],
     coverageReporters: ['html', 'text', 'text-summary', 'lcov'],
 };

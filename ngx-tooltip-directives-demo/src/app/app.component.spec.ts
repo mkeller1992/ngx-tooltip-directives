@@ -1,7 +1,11 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { MockNgxTooltipDirectivesModule } from '@ngx-tooltip-directives';
-import { AngularDraggableModule } from "angular2-draggable";
+import { DomSanitizer } from "@angular/platform-browser";
+import {
+  MockTooltipHtmlDirective, MockTooltipStrDirective, MockTooltipTemplateDirective,
+  TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective
+} from "@ngx-tooltip-directives";
 import { AppComponent } from "./app.component";
+
 
 describe("AppComponent", () => {
   let component: AppComponent;
@@ -9,14 +13,28 @@ describe("AppComponent", () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ 
-        AppComponent
-      ],
-      imports: [ 
-        AngularDraggableModule,
-        MockNgxTooltipDirectivesModule
-      ],
-    }).compileComponents();
+      imports: [ AppComponent ],
+      providers: [
+        { provide: DomSanitizer, useValue: { bypassSecurityTrustHtml: () => {} } },
+      ]
+    })
+    .overrideComponent(AppComponent, {
+      remove: {
+        imports: [
+          TooltipStrDirective,
+          TooltipHtmlDirective,
+          TooltipTemplateDirective
+        ]
+      },
+      add: {
+        imports: [
+          MockTooltipStrDirective,
+          MockTooltipHtmlDirective,
+          MockTooltipTemplateDirective
+        ]
+      }
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;

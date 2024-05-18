@@ -1,12 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TooltipStrDirective } from '@ngx-tooltip-directives';
+import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from '@ngx-tooltip-directives';
+import { AngularDraggableModule } from 'angular2-draggable';
 import packageJson from '../../package.json';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [TooltipStrDirective, TooltipHtmlDirective, TooltipTemplateDirective, AngularDraggableModule]
 })
 
 export class AppComponent implements OnInit {

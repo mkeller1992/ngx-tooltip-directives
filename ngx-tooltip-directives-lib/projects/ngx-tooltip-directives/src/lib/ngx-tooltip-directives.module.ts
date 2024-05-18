@@ -8,14 +8,11 @@ import { TooltipTemplateDirective } from './tooltip-template.directive';
 import { TooltipComponent } from './tooltip.component';
 
 @NgModule({
-  declarations: [
+  imports: [
     TooltipComponent,
     TooltipStrDirective,
     TooltipHtmlDirective,
     TooltipTemplateDirective,
-  ],
-  imports: [
-    CommonModule
   ],
   exports: [
     TooltipStrDirective,

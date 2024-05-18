@@ -4,6 +4,7 @@ import { BaseTooltipDirective } from "./base-tooltip.directive";
 @Directive({
     selector: '[tooltipTemplate]',
     exportAs: 'tooltipTemplate',
+    standalone: true
 })
 
 export class TooltipTemplateDirective extends BaseTooltipDirective {
@@ -12,5 +13,4 @@ export class TooltipTemplateDirective extends BaseTooltipDirective {
     set tooltipTemplate(value: TemplateRef<any>) {
         super.setTooltipContent(value, 'template');
     }
-
 }

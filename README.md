@@ -6,12 +6,16 @@
 
 This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained ng2-tooltip-directive.
 
-This library is compatible with **Angular 17** and above.
+It is compatible with **Angular 17** and above.
 
 Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
+---
+
 ## Demo
 https://mkeller1992.github.io/ngx-tooltip-directives/
+
+---
 
 ## Setup
 
@@ -28,6 +32,8 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
     imports: [ NgxTooltipDirectivesModule ]
 }) 
 ```
+
+---
 
 ## 3 ways of setting the tooltip content
     
@@ -68,6 +74,7 @@ export class AppComponent {
 <div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
+---
 
 ## Trigger tooltip programmatically
 ```html
@@ -89,6 +96,7 @@ hide() {
 }
 ```
 
+---
 
 ## 3 ways of setting tooltip options
 
@@ -126,6 +134,8 @@ const myDefaultTooltipOptions: TooltipOptions = {
 })
 ```
 
+---
+
 ## Properties
 
 | name                  | type                                  | default | description |
@@ -141,12 +151,12 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | padding               | string                                | '10px 13px 10px 13px' | The padding around the tooltip text (top, right, bottom, left). |
 | shadow                | boolean                               | true    | If true, the tooltip will have a shadow. |
 | showDelay             | number                                | 0       | The delay in ms before the tooltip is shown. |
-| hideDelay             | number                                | 300     | The delay in ms before the tooltip is removed. |
+| hideDelay             | number                                | 0       | The delay in ms before the tooltip is removed. |
 | hideDelayTouchscreen  | number                                | 0       | The delay in ms before the tooltip is hidden on mobile devices. |
 | zIndex                | number                                | 0       | The z-index of the tooltip. |
 | animationDuration     | number                                | 100     | The duration in ms that the animation takes to run from start to finish. |
 | trigger               | "hover" \| "click"                    | 'hover' | Specifies how the tooltip is triggered. The closing time is controlled with "hide-delay". |
-| tooltipClass          | string                                | ''      | Any additional classes to be passed to the tooltip. |
+| tooltipClass          | string                                | ''      | Any additional classes to be passed to the tooltip (target them with `::ng-deep`). |
 | display               | boolean                               | true    | If true, the tooltip is available for display. |
 | displayTouchscreen    | boolean                               | true    | If true, the tooltip will be displayed on mobile devices. |
 | offset                | number                                | 8       | The offset of the tooltip relative to the item. |
@@ -155,6 +165,8 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
 | position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
    
+---
+
 ## Events
 
 Events are called in accordance with the delays specified in the options within the directive. By default, there is a 300-millisecond delay before the tooltip hides.
@@ -165,7 +177,9 @@ Events are called in accordance with the delays specified in the options within 
 | {type: "shown", position: DOMRect} | This event is fired following the tooltip's appearance animation. |
 | {type: "hide", position: DOMRect} | This event is fired prior to the tooltip being hidden. |
 | {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |  
-   
+
+---
+
 ## Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.
@@ -174,3 +188,70 @@ If you have defined the directive options, these will be taken into consideratio
 |------------------|---------------------------------------------------------------------------------------------|
 | show()           | Displays the tooltip. |
 | hide()           | Hides the tooltip. |
+
+---
+
+## Testing with NgxTooltipDirectives
+
+To simplify unit testing of components that use `NgxTooltipDirectives`, this library provides a set of mock directives as well as a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing on the component logic instead.
+
+### Mocking when component under test is a standalone component
+In the test initialization you might have to use `.overrideComponent` in order to override the actual directives with the mock-directives that are provided by my library.
+
+```typescript
+import { TestBed } from "@angular/core/testing";
+import { DomSanitizer } from "@angular/platform-browser";
+import { MockTooltipHtmlDirective, MockTooltipStrDirective, MockTooltipTemplateDirective,
+         TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from "@ngx-tooltip-directives";
+import { AppComponent } from "./app.component";
+
+describe("AppComponent", () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ AppComponent ],
+      providers: [
+        { provide: DomSanitizer, useValue: { bypassSecurityTrustHtml: () => {} } },
+      ]
+    })
+    .overrideComponent(AppComponent, {
+      remove: {
+        imports: [
+          TooltipStrDirective,
+          TooltipHtmlDirective,
+          TooltipTemplateDirective
+        ]
+      },
+      add: {
+        imports: [
+          MockTooltipStrDirective,
+          MockTooltipHtmlDirective,
+          MockTooltipTemplateDirective
+        ]
+      }
+    })
+    .compileComponents();
+  });
+  // Your tests here
+});
+```
+
+### Mocking when component under test is a NgModule-based component
+
+Import `MockNgxTooltipDirectivesModule` in your test suite's TestBed configuration:
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+import { MockNgxTooltipDirectivesModule } from '@ngx-tooltip-directives';
+
+describe('AppComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AppComponent],
+      imports: [MockNgxTooltipDirectivesModule]
+    }).compileComponents();
+  });
+
+  // Your tests here
+});
+```

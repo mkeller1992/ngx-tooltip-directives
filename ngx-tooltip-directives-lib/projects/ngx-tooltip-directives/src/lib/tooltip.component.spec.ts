@@ -22,10 +22,10 @@ describe('TooltipComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TooltipComponent],
+      imports: [TooltipComponent],
       providers: [
+        Renderer2,
         { provide: ElementRef, useValue: mockElementRef },
-        Renderer2
       ]
     }).compileComponents();
 
@@ -104,9 +104,6 @@ describe('TooltipComponent', () => {
 
 
   });
-
-
-
 
 });
 

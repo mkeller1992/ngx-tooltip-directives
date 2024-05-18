@@ -21,7 +21,8 @@ describe('TooltipTemplateDirective', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TooltipTemplateDirective, HostComponent],
+            declarations: [HostComponent],
+            imports: [TooltipTemplateDirective]
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostComponent);

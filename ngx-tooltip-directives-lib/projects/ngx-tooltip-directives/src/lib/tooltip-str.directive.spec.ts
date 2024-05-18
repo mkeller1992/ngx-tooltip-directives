@@ -16,7 +16,8 @@ describe('TooltipStrDirective', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TooltipStrDirective, HostComponent],
+            declarations: [HostComponent],
+            imports: [TooltipStrDirective]
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostComponent);

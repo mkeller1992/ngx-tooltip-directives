@@ -18,5 +18,3 @@ class DOMRectMock {
 if (typeof DOMRect === "undefined") {
   (global as any).DOMRect = DOMRectMock;
 }
-  
-// global.DOMRect = DOMRectMock;

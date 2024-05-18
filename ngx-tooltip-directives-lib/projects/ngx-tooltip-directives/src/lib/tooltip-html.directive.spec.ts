@@ -17,7 +17,8 @@ import { TooltipHtmlDirective } from './tooltip-html.directive';
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [TooltipHtmlDirective, HostComponent],
+            declarations: [HostComponent],
+            imports: [TooltipHtmlDirective]
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostComponent);

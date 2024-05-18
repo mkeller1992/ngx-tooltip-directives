@@ -193,9 +193,49 @@ If you have defined the directive options, these will be taken into consideratio
 
 ## Testing with NgxTooltipDirectives
 
-For easier unit testing of components that use `NgxTooltipDirectives`, we provide a set of mock directives and a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing instead on the component logic.
+To simplify unit testing of components that use `NgxTooltipDirectives`, this library provides a set of mock directives as well as a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing on the component logic instead.
 
-### Using the Mock Module
+### Mocking when component under test is a standalone component
+In the test initialization you might have to use `.overrideComponent` in order to override the actual directives with the mock-directives that are provided by my library.
+
+```typescript
+import { TestBed } from "@angular/core/testing";
+import { DomSanitizer } from "@angular/platform-browser";
+import { MockTooltipHtmlDirective, MockTooltipStrDirective, MockTooltipTemplateDirective,
+         TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from "@ngx-tooltip-directives";
+import { AppComponent } from "./app.component";
+
+describe("AppComponent", () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ AppComponent ],
+      providers: [
+        { provide: DomSanitizer, useValue: { bypassSecurityTrustHtml: () => {} } },
+      ]
+    })
+    .overrideComponent(AppComponent, {
+      remove: {
+        imports: [
+          TooltipStrDirective,
+          TooltipHtmlDirective,
+          TooltipTemplateDirective
+        ]
+      },
+      add: {
+        imports: [
+          MockTooltipStrDirective,
+          MockTooltipHtmlDirective,
+          MockTooltipTemplateDirective
+        ]
+      }
+    })
+    .compileComponents();
+  });
+  // Your tests here
+});
+```
+
+### Mocking when component under test is a NgModule-based component
 
 Import `MockNgxTooltipDirectivesModule` in your test suite's TestBed configuration:
 
@@ -214,3 +254,4 @@ describe('AppComponent', () => {
 
   // Your tests here
 });
+```

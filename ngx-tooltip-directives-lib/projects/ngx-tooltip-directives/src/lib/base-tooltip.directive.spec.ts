@@ -22,12 +22,14 @@ import { TooltipOptions } from './options.interface';
     
       await TestBed.configureTestingModule({
         declarations: [
-          TooltipStrDirective,
-          TooltipHtmlDirective,
           HostWithStrTooltipComponent,
           HostWithHtmlTooltipComponent,
           HostWithTooltipWithOptionsComponent
         ],
+        imports: [
+          TooltipStrDirective,
+          TooltipHtmlDirective
+        ]
       })
       .compileComponents();
   

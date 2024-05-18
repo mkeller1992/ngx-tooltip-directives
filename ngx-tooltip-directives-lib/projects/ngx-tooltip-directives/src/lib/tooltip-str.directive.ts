@@ -4,6 +4,7 @@ import { BaseTooltipDirective } from "./base-tooltip.directive";
 @Directive({
     selector: '[tooltipStr]',
     exportAs: 'tooltipStr',
+    standalone: true
 })
 
 export class TooltipStrDirective extends BaseTooltipDirective {
@@ -12,5 +13,4 @@ export class TooltipStrDirective extends BaseTooltipDirective {
     set tooltipStr(value: string) {
         super.setTooltipContent(value, 'string');
     }
-
 }

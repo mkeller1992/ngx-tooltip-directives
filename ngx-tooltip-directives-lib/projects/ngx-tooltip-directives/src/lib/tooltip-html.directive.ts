@@ -6,6 +6,7 @@ import { BaseTooltipDirective } from "./base-tooltip.directive";
 @Directive({
     selector: '[tooltipHtml]',
     exportAs: 'tooltipHtml',
+    standalone: true
 })
 
 export class TooltipHtmlDirective extends BaseTooltipDirective {
@@ -14,5 +15,4 @@ export class TooltipHtmlDirective extends BaseTooltipDirective {
     set tooltipHtml(value: SafeHtml) {
         super.setTooltipContent(value, 'html');
     }
-
 }

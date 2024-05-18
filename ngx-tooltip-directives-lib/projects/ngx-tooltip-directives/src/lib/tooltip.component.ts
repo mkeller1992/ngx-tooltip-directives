@@ -6,6 +6,7 @@ import { defaultOptions } from './default-options.const';
 import { TooltipOptions } from './options.interface';
 import { Placement } from './placement.type';
 import { TooltipDto } from './tooltip.dto';
+import { CommonModule } from '@angular/common';
 
 interface TooltipStyles {
 	placement: Placement;
@@ -21,6 +22,8 @@ interface TooltipStyles {
 	selector: 'tooltip',
 	templateUrl: './tooltip.component.html',
 	styleUrls: ['./tooltip.component.scss'],
+	standalone: true,
+	imports: [CommonModule]
   })
   
 

@@ -148,7 +148,8 @@ export abstract class MockBaseTooltipDirective {
 
 @Directive({
   selector: '[tooltipStr]',
-  exportAs: 'tooltipStr'
+  exportAs: 'tooltipStr',
+  standalone: true
 })
 export class MockTooltipStrDirective extends MockBaseTooltipDirective {
   @Input() tooltipStr!: string;
@@ -156,7 +157,8 @@ export class MockTooltipStrDirective extends MockBaseTooltipDirective {
 
 @Directive({
   selector: '[tooltipHtml]',
-  exportAs: 'tooltipHtml'
+  exportAs: 'tooltipHtml',
+  standalone: true
 })
 export class MockTooltipHtmlDirective extends MockBaseTooltipDirective {
   @Input() tooltipHtml!: string;
@@ -164,14 +166,15 @@ export class MockTooltipHtmlDirective extends MockBaseTooltipDirective {
 
 @Directive({
   selector: '[tooltipTemplate]',
-  exportAs: 'tooltipTemplate'
+  exportAs: 'tooltipTemplate',
+  standalone: true
 })
 export class MockTooltipTemplateDirective extends MockBaseTooltipDirective {
   @Input() tooltipTemplate!: any;
 }
 
 @NgModule({
-  declarations: [
+  imports: [
     MockTooltipStrDirective,
     MockTooltipHtmlDirective,
     MockTooltipTemplateDirective,
