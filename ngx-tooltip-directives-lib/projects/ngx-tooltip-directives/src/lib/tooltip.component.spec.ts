@@ -74,7 +74,7 @@ describe('TooltipComponent', () => {
     expect(component.tooltipState).toBe('hide');
   });
 
-  it('should calculate correct styles for placement right', () => {
+  it('should calculate correct styles', () => {
     jest.useFakeTimers();
 
     const setPlacementStylesSpy = jest.spyOn(component as any, 'setPlacementStyles');
