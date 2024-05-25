@@ -74,12 +74,6 @@
           },
           "defaultConfiguration": "development"
         },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
-          "options": {
-            "buildTarget": "ngx-tooltip-directives-demo:build"
-          }
-        },
         "test": {
           "builder": "@angular-builders/jest:run"
         }
