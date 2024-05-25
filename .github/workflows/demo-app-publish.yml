@@ -94,7 +94,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: gh-pages
-          folder: ${{ env.DEMO_APP_FOLDER_NAME }}/dist/${{ env.DEMO_PROJECT_NAME }}
+          folder: ${{ env.DEMO_APP_FOLDER_NAME }}/dist/${{ env.DEMO_PROJECT_NAME }}/browser
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: '🚀 v${{ env.CURRENT_VERSION }} deployed to GitHub Pages'
       
