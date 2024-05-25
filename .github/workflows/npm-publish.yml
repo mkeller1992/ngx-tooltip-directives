@@ -33,7 +33,7 @@ jobs:
 
       # Install dependencies at the root level
       - name: Install Dependencies
-        run: npm install --force
+        run: npm install
         working-directory: ${{ env.BASE_DIR }}
 
       # Run tests at the root level
