@@ -5,7 +5,12 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "jest"
-    ]
+    ],
+    "paths": {
+      "@ngx-tooltip-directives": [
+        "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
+      ]
+    }
   },
   "include": [
     "src/**/*.spec.ts",

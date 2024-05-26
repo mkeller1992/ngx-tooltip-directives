@@ -1,11 +1,15 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
+/* Specific settings only applied for ng build (but not for npm start or ng serve) */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": [
-      "jest"
-    ]
+    "types": [],
+    "paths": {
+      "@ngx-tooltip-directives": [
+        "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
+      ],
+      "@angular/*": [ "./node_modules/@angular/*"]
+    }
   },
   "files": [
     "src/main.ts"
