@@ -136,16 +136,36 @@ myOptions: TooltipOptions = {
 
 
 3 - Options can be set globally when importing the module:
+
+For apps based on `Standalone Components`:
+
 ```ts
-import { TooltipModule, TooltipOptions } from 'ngx-tooltip-directives';
+import { NgxTooltipDirectivesModule, TooltipOptions } from 'ngx-tooltip-directives';
 
 const myDefaultTooltipOptions: TooltipOptions = {
-  'show-delay': 800
+  'backgroundColor': 'yellow'
+}
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+			NgxTooltipDirectivesModule.forRoot(myDefaultTooltipOptions)
+		)
+  ]
+}).catch(err => console.error(err));
+```
+For apps based on `ngModule's`:
+
+```ts
+import { NgxTooltipDirectivesModule, TooltipOptions } from 'ngx-tooltip-directives';
+
+const myDefaultTooltipOptions: TooltipOptions = {
+  'backgroundColor': 'yellow'
 }
 
 @NgModule({
     imports: [ 
-      TooltipModule.forRoot(myDefaultTooltipOptions)
+      NgxTooltipDirectivesModule.forRoot(myDefaultTooltipOptions)
     ]
 })
 ```
