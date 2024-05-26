@@ -27,9 +27,6 @@
     "paths": {
       "@ngx-tooltip-directives": [
         "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
-      ],
-      "@angular/*": [
-        "./node_modules/@angular/*"
       ]
     }
   },
