@@ -75,7 +75,7 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular-builders/jest:run"
+          "builder": "@nrwl/jest:jest"
         }
       }
     }

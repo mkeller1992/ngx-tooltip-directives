@@ -25,7 +25,7 @@
           "defaultConfiguration": "production"
         },
         "test": {
-        "builder": "@angular-builders/jest:run",
+          "builder": "@nrwl/jest:jest",
           "options": {
             "configPath": "../../jest.config.ts"
           }

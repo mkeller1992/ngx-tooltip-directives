@@ -6,7 +6,7 @@
 
 This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained ng2-tooltip-directive.
 
-It is compatible with **Angular 18** and above.
+The latest library version is compatible with **Angular 18**.
 
 Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
@@ -17,14 +17,31 @@ https://mkeller1992.github.io/ngx-tooltip-directives/
 
 ---
 
-## Setup
+## Install
 
 To install the library, enter the following command in your console:
+```
+npm i ngx-tooltip-directives
+```
 
-    npm i ngx-tooltip-directives
-        
-Import `NgxTooltipDirectivesModule`:
+## Setup
+### For apps based on `Standalone Components`
+Import the directives for the respective tooltips directly in your component:
+```ts
+import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from '@ngx-tooltip-directives';
 
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [TooltipStrDirective, TooltipHtmlDirective, TooltipTemplateDirective]
+})
+```
+
+
+### For apps based on `ngModule`
+Make sure you import `NgxTooltipDirectivesModule` into your `@NgModule`:
 ```ts
 import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
  
@@ -33,17 +50,16 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
 }) 
 ```
 
----
-
-## 3 ways of setting the tooltip content
+## Usage
+There are three ways of creating a tooltip:
     
-1 - Pass the tooltip text as a string via `tooltipStr`:
+### Pass the tooltip text as a string via `tooltipStr`:
 
 ```html
 <div tooltipStr="Tooltip text">Show Tooltip</div>
 ```
 
-2 - Pass the tooltip content as SafeHtml via `tooltipHtml`:
+### Pass the tooltip content as SafeHtml via `tooltipHtml`:
 
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
@@ -62,7 +78,7 @@ export class AppComponent {
 }
 ```
 
-3 - Pass the tooltip content as template via `tooltipTemplate`:
+### Pass the tooltip content as template via `tooltipTemplate`:
 
 ```html
 <ng-template #myTemplate>
