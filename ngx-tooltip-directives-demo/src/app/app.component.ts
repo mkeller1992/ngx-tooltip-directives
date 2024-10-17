@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
     this.tooltipProgrammatically.hide();
   }
 
-  handleTooltipEvents(event: {type: "shown", position: { top: number; left: number; } | DOMRect; }){
+  handleTooltipEvents(event: {type: string, position: { top: number; left: number; } | DOMRect }){
     console.log(event);
   }
 }
