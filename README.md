@@ -205,14 +205,14 @@ const myDefaultTooltipOptions: TooltipOptions = {
 
 ## Events
 
-Events are called in accordance with the delays specified in the options within the directive. By default, there is a 300-millisecond delay before the tooltip hides.
+Events are called in accordance with the delays specified in the options within the directive. By default, there is a no delay before the tooltip hides.
 
 | Event            | Description                                                                                 |
 |------------------|---------------------------------------------------------------------------------------------|
-| {type: "show", position: DOMRect} | This event is fired prior to the tooltip's appearance. |
-| {type: "shown", position: DOMRect} | This event is fired following the tooltip's appearance animation. |
-| {type: "hide", position: DOMRect} | This event is fired prior to the tooltip being hidden. |
-| {type: "hidden", position: DOMRect} | This event is fired after the tooltip hiding animation completes. |  
+| {type: "show", position: { top: number; left: number; } | DOMRect } | This event is fired prior to the tooltip's appearance. |
+| {type: "shown", position: { top: number; left: number; } | DOMRect} | This event is fired following the tooltip's appearance animation. |
+| {type: "hide", position: { top: number; left: number; } | DOMRect} | This event is fired prior to the tooltip being hidden. |
+| {type: "hidden", position: { top: number; left: number; } | DOMRect} | This event is fired after the tooltip hiding animation completes. |  
 
 ---
 
