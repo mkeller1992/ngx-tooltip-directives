@@ -27,13 +27,7 @@
 
   &.tooltip-shadow {
     box-shadow: 0 7px 15px -5px rgba(0, 0, 0, 0.4);
-  }
-
-  &.tooltip-clickable {
-    .tooltip-label {
-      cursor: pointer;
-    } 
-  }  
+  } 
 
   &.tooltip {
     border: 1px solid rgba(0, 0, 0, .06);

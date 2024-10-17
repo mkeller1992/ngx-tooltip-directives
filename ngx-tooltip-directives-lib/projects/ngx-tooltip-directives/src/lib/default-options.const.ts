@@ -14,7 +14,7 @@ export const defaultOptions: TooltipOptions = {
 	showDelay: 0,
 	hideDelay: 0,
 	hideDelayTouchscreen: 0,
-	hideDelayAfterClick: undefined,
+	hideDelayAfterClick: 0,
 	zIndex: 0,
 	animationDuration: 100,
 	animationDurationDefault: 100,

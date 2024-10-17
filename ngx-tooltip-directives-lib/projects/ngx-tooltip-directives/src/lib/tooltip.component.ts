@@ -29,11 +29,13 @@ interface TooltipStyles {
 
 export class TooltipComponent implements OnInit, OnDestroy {
 
-    events = new EventEmitter();
+    // The observable below will inform base-tooltip-directive when user clicked outside tooltip:
+	private userClickOutsideTooltipSubject = new Subject<MouseEvent>();
+	userClickOutsideTooltip$ = this.userClickOutsideTooltipSubject.asObservable();
 
-    // The observable below will inform error-tooltip-directive when user clicked on tooltip:
-    private userClickOnTooltipSubject = new Subject<void>();
-    userClickOnTooltip$ = this.userClickOnTooltipSubject.asObservable();    
+	// This information is purely for the user to know when the tooltip is shown or hidden:
+	private visibilityChangeCompletedSubject = new Subject<{ type: string }>();
+	visibilityChangeCompleted$ = this.visibilityChangeCompletedSubject.asObservable();
 
     destroy$ = new Subject<void>();
 
@@ -51,8 +53,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
     @HostBinding('style.width') hostStyleWidth!: string;
     @HostBinding('style.max-width') hostStyleMaxWidth!: string;
     @HostBinding('style.pointer-events') hostStylePointerEvents!: string;
-    @HostBinding('class.tooltip-shadow') hostClassShadow!: boolean;	
-	@HostBinding('class.tooltip-clickable') hostClassClickable!: boolean;
+    @HostBinding('class.tooltip-shadow') hostClassShadow!: boolean;
 
 	@HostBinding('style.--tooltip-text-color') textColor!: string;
 	@HostBinding('style.--tooltip-text-align') textAlign!: string;
@@ -76,6 +77,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
                 private renderer: Renderer2) {}
 
     ngOnInit() {
+		this.listenToClicksOutsideTooltip();
     	this.listenToFadeInEnd();
     	this.listenToFadeOutEnd();
     }
@@ -118,20 +120,29 @@ export class TooltipComponent implements OnInit, OnDestroy {
     }
 
 
-    /* Method that gets invoked by html */
-
-    handleTooltipClick() {
-    	this.userClickOnTooltipSubject.next();
-    }
-
-
 	/* Private helper methods */
+
+	private listenToClicksOutsideTooltip() {
+		fromEvent<MouseEvent>(window, 'click')
+		  	.pipe(
+				tap((event: MouseEvent) => {
+					const targetElement = event.target as HTMLElement;		
+					// Check if the clicked element is not within the tooltip element
+					if (this.elementRef.nativeElement &&
+						!this.elementRef.nativeElement.contains(targetElement)) {
+						this.userClickOutsideTooltipSubject.next(event);
+					}
+				}),
+				takeUntil(this.destroy$)
+			)
+		  	.subscribe();
+	  }
 
 	private listenToFadeInEnd() {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 			filter(event => event.propertyName === 'opacity' && this.tooltipState === 'show'),
-			tap(() => this.events.emit({ type: 'shown' })),
+			tap(() => this.visibilityChangeCompletedSubject.next({ type: 'shown' })),
 			takeUntil(this.destroy$),
 		  )
 		  .subscribe();
@@ -141,7 +152,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 			filter(event => event.propertyName === 'opacity' && this.tooltipState === 'hide'),
-			tap(() => this.events.emit({ type: 'hidden' })),
+			tap(() => this.visibilityChangeCompletedSubject.next({ type: 'hidden' })),
 			takeUntil(this.destroy$)
 		  )
 		  .subscribe();
@@ -301,7 +312,6 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		this.backgroundColor = options.backgroundColor ?? defaultOptions.backgroundColor!;
 		this.borderColor = options.borderColor ?? defaultOptions.borderColor!;
         this.hostClassShadow = options.shadow ?? true;
-		this.hostClassClickable = options?.trigger === 'click';
 
 		if (options.maxWidth) {
 			this.hostStyleMaxWidth = options.maxWidth;

@@ -197,7 +197,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | displayTouchscreen    | boolean                               | true    | If true, the tooltip will be displayed on mobile devices. |
 | offset                | number                                | 8       | The offset of the tooltip relative to the item. |
 | maxWidth              | string                                | '200px' | The maximum width of the tooltip. |
-| hideDelayAfterClick   | number                                | undefined | The delay in ms before hiding the tooltip when the "click" trigger is used. |
+| hideDelayAfterClick   | number                                | 0 | The delay in ms before hiding the tooltip when the "click" trigger is used. |
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
 | position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
    

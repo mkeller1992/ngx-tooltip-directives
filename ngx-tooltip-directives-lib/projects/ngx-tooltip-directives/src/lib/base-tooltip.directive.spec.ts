@@ -115,9 +115,8 @@ import { TooltipOptions } from './options.interface';
       it('should initialize correct listeners when isDisplayOnHover is set', () => {
 
          /* Arrange */
-        const listenToClickOnHostElementSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToClickOnHostElement');
-        const listenToInteractionsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToInteractions');
-        const listenToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToResizeEvents');
+        const subscribeToShowTriggersSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
+        const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
   
         // Mock return-values of the getters 'isDisplayOnHover()' and 'isDisplayOnClick()'
         jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(true);
@@ -127,17 +126,15 @@ import { TooltipOptions } from './options.interface';
         fixtureStrTooltip.detectChanges();
     
         /* Assert */
-        expect(listenToClickOnHostElementSpy).toHaveBeenCalledTimes(0);
-        expect(listenToInteractionsSpy).toHaveBeenCalledTimes(1);
-        expect(listenToResizeEventsSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToShowTriggersSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(0);
       });
   
       it('should initialize correct listeners when isDisplayOnClick is set', () => {
         
         /* Arrange */
-        const listenToClickOnHostElementSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToClickOnHostElement');
-        const listenToInteractionsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToInteractions');
-        const listenToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToResizeEvents');
+        const subscribeToShowTriggersSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
+        const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
   
         // Mock return-values of the getters 'isDisplayOnHover()' and 'isDisplayOnClick()'
         jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(false);
@@ -147,9 +144,8 @@ import { TooltipOptions } from './options.interface';
         fixtureStrTooltip.detectChanges();
     
         /* Assert */
-        expect(listenToClickOnHostElementSpy).toHaveBeenCalledTimes(1);
-        expect(listenToInteractionsSpy).toHaveBeenCalledTimes(0);
-        expect(listenToResizeEventsSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToShowTriggersSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(0);
       });
   
   
@@ -171,9 +167,10 @@ import { TooltipOptions } from './options.interface';
           setPosition() {}
         } as TooltipComponent;
         
-        const listenToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToResizeEvents');
+        const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
         const setPositionOnTooltipComponentSpy = jest.spyOn(strTooltipDirectiveInstance['tooltipComponent'], 'setPosition');
         strTooltipDirectiveInstance['isTooltipVisible'] = true;
+        (strTooltipDirectiveInstance as any).subscribeToResizeEvents();
         
         /* Act */
         fixtureStrTooltip.detectChanges();
@@ -182,7 +179,7 @@ import { TooltipOptions } from './options.interface';
         jest.advanceTimersByTime(100);
   
         /* Assert */
-        expect(listenToResizeEventsSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(1);
         expect(setPositionOnTooltipComponentSpy).toHaveBeenCalledTimes(1);
       });
   
@@ -213,11 +210,47 @@ import { TooltipOptions } from './options.interface';
         /* Assert */
         expect(showTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
       });
+
+      it('should subscribe to correct listeners when tooltip gets displayed for the second time', () => {   
+        
+        /* Arrange */
+        jest.useFakeTimers();
+        // Mock return-values of the getter 'isDisplayOnHover()'
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(true);
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnClick', 'get').mockReturnValue(false);
+        
+        /* Act */
+        fixtureStrTooltip.detectChanges();
+        const focusInEvent = new MouseEvent('focusin');
+        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusInEvent);
+        jest.advanceTimersByTime(1);
+        const focusOutEvent = new MouseEvent('focusout');
+        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusOutEvent);
+        jest.advanceTimersByTime(1);
+
+        /* Arrange */
+        const showTooltipAfterDelaySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'showTooltipAfterDelay');
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const subscribeToHideTriggersSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToHideTriggers');
+        const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
+
+         /* Act */
+        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusInEvent);
+        jest.advanceTimersByTime(1);
+        
+        /* Assert */
+        expect(showTooltipAfterDelaySpy).toHaveBeenCalledTimes(1);
+        expect(showTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('visible');
+        expect(subscribeToHideTriggersSpy).toHaveBeenCalledTimes(1);
+        expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(1);
+      });
   
       it('should trigger show() on first user-click when isDisplayOnClick is set', () => {
 
-        /* Arrange */
-        const listenToClickOnHostElementSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToClickOnHostElement');
+        /* Arrange */       
+        jest.useFakeTimers();
         const showSpy = jest.spyOn(strTooltipDirectiveInstance, 'show');
   
         // Mock return-values of the getters 'isDisplayOnHover()' and 'isDisplayOnClick()'
@@ -226,12 +259,13 @@ import { TooltipOptions } from './options.interface';
   
         /* Act */
         fixtureStrTooltip.detectChanges();
-        const focusInEvent = new Event('click');
-        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusInEvent);
-  
+        const clickEvent = new Event('click');
+        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(clickEvent);
+        jest.advanceTimersByTime(1);
+
         /* Assert */
-        expect(listenToClickOnHostElementSpy).toHaveBeenCalledTimes(1);
         expect(showSpy).toHaveBeenCalledTimes(1);
+        expect(showSpy).toHaveBeenCalledWith(false);
       });
   
       it('should create and show correct tooltip-string when mouse enters element with tooltip', () => {
@@ -241,8 +275,8 @@ import { TooltipOptions } from './options.interface';
         
         const createTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'createTooltip');
         const appendComponentToBodySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'appendComponentToBody');
-        const showTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'showTooltip');
-        const triggerShowTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'triggerShowTooltipOnHostComponent'); 
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const showTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'showTooltipOnHostComponent'); 
         
         /* Act */
 
@@ -255,10 +289,11 @@ import { TooltipOptions } from './options.interface';
         expect(createTooltipSpy).toHaveBeenCalledTimes(1);
         expect(appendComponentToBodySpy).toHaveBeenCalledTimes(1);
         expect(strTooltipDirectiveInstance['tooltipComponent']).toBeDefined();
-        expect(showTooltipSpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('visible');
   
         expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(true);
-        expect(triggerShowTooltipOnHostComponentSpy).toHaveBeenCalledWith(
+        expect(showTooltipOnHostComponentSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             tooltipStr: 'Tooltip String Text',
             tooltipHtml: undefined,
@@ -274,8 +309,8 @@ import { TooltipOptions } from './options.interface';
         
         const createTooltipSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'createTooltip');
         const appendComponentToBodySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'appendComponentToBody');
-        const showTooltipSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'showTooltip');
-        const triggerShowTooltipOnHostComponentSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'triggerShowTooltipOnHostComponent');
+        const setTooltipVisibilitySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const showTooltipOnHostComponentSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'showTooltipOnHostComponent');
         const expectedTooltipContent = {"changingThisBreaksApplicationSecurity": "<div>This is a <strong>tooltip</strong> with HTML</div>"};
         
         /* Act */
@@ -288,10 +323,11 @@ import { TooltipOptions } from './options.interface';
         expect(createTooltipSpy).toHaveBeenCalledTimes(1);
         expect(appendComponentToBodySpy).toHaveBeenCalledTimes(1);
         expect(htmlTooltipDirectiveInstance['tooltipComponent']).toBeDefined();
-        expect(showTooltipSpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('visible');
   
         expect(htmlTooltipDirectiveInstance['isTooltipVisible']).toBe(true);
-        expect(triggerShowTooltipOnHostComponentSpy).toHaveBeenCalledWith(
+        expect(showTooltipOnHostComponentSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             tooltipStr: undefined,
             tooltipHtml: expectedTooltipContent,
@@ -315,14 +351,17 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
   
         const hideTooltipAfterDelaySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipAfterDelay');
-        const hideTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltip');
-        const triggerHideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'triggerHideTooltipOnHostComponent'); 
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const hideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipOnHostComponent');
   
         strTooltipDirectiveInstance['isTooltipVisible'] = true;
         // Force getter 'isTooltipComponentDestroyed()' to return false:
         jest.spyOn(strTooltipDirectiveInstance as any, 'isTooltipComponentDestroyed', 'get').mockReturnValue(false);
+        // Mock return-values of the getter 'isDisplayOnHover()'
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(true);
         
         /* Act */
+        (strTooltipDirectiveInstance as any).subscribeToHideTriggers();
         fixtureStrTooltip.detectChanges();
         const mouseLeaveEvent = new MouseEvent('mouseleave');
         fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(mouseLeaveEvent);  
@@ -330,8 +369,9 @@ import { TooltipOptions } from './options.interface';
   
         /* Assert */
         expect(hideTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
-        expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
-        expect(triggerHideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('hidden');
+        expect(hideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
         expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
       });
   
@@ -341,14 +381,17 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
   
         const hideTooltipAfterDelaySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipAfterDelay');
-        const hideTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltip');
-        const triggerHideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'triggerHideTooltipOnHostComponent'); 
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const hideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipOnHostComponent');
   
         strTooltipDirectiveInstance['isTooltipVisible'] = true;
         // Force getter 'isTooltipComponentDestroyed()' to return false:
         jest.spyOn(strTooltipDirectiveInstance as any, 'isTooltipComponentDestroyed', 'get').mockReturnValue(false);
+        // Mock return-values of the getter 'isDisplayOnHover()'
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(true);
         
         /* Act */
+        (strTooltipDirectiveInstance as any).subscribeToHideTriggers();
         fixtureStrTooltip.detectChanges();
         const focusOutEvent = new MouseEvent('focusout');
         fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusOutEvent);  
@@ -356,25 +399,29 @@ import { TooltipOptions } from './options.interface';
   
         /* Assert */
         expect(hideTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
-        expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
-        expect(triggerHideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(hideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
         expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
       });
   
-      it('should hide tooltip on scroll', () => {
+      it('should hide tooltip on scroll when displayOnHover is set', () => {
 
         /* Arrange */
         jest.useFakeTimers();
   
         const hideTooltipAfterDelaySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipAfterDelay');
-        const hideTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltip');
-        const triggerHideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'triggerHideTooltipOnHostComponent'); 
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const hideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipOnHostComponent');
   
         strTooltipDirectiveInstance['isTooltipVisible'] = true;
         // Force getter 'isTooltipComponentDestroyed()' to return false:
         jest.spyOn(strTooltipDirectiveInstance as any, 'isTooltipComponentDestroyed', 'get').mockReturnValue(false);
+        // Mock return-values of the getter 'isDisplayOnHover()'
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(true);
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnClick', 'get').mockReturnValue(false);
         
         /* Act */
+        (strTooltipDirectiveInstance as any).subscribeToHideTriggers();
         fixtureStrTooltip.detectChanges();
         const scrollEvent = new Event('scroll');
         document.dispatchEvent(scrollEvent);  
@@ -382,33 +429,40 @@ import { TooltipOptions } from './options.interface';
   
         /* Assert */
         expect(hideTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
-        expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
-        expect(triggerHideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(hideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
         expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
       });
-  
-      it('should trigger hide() on user-click when isDisplayOnClick is set', () => {
+
+      it('should hide tooltip on scroll when displayOnClick is set', () => {
 
         /* Arrange */
-        const listenToClickOnHostElementSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'listenToClickOnHostElement');
-        const hideTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltip');
+        jest.useFakeTimers();
+  
+        const hideTooltipAfterDelaySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipAfterDelay');
+        const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+        const hideTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'hideTooltipOnHostComponent');
   
         strTooltipDirectiveInstance['isTooltipVisible'] = true;
-  
-        // Mock return-values of the getters 'isDisplayOnHover()' and 'isDisplayOnClick()'
+        // Force getter 'isTooltipComponentDestroyed()' to return false:
+        jest.spyOn(strTooltipDirectiveInstance as any, 'isTooltipComponentDestroyed', 'get').mockReturnValue(false);
+        // Mock return-values of the getter 'isDisplayOnHover()'
         jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(false);
         jest.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnClick', 'get').mockReturnValue(true);
-
-        /* Act */  
+        
+        /* Act */
+        (strTooltipDirectiveInstance as any).subscribeToHideTriggers();
         fixtureStrTooltip.detectChanges();
-        const focusInEvent = new Event('click');
-        fixtureStrTooltip.debugElement.query(By.directive(TooltipStrDirective)).nativeElement.dispatchEvent(focusInEvent);
+        const scrollEvent = new Event('scroll');
+        document.dispatchEvent(scrollEvent);  
+        jest.advanceTimersByTime(1);
   
         /* Assert */
-        expect(listenToClickOnHostElementSpy).toHaveBeenCalledTimes(1);
-        expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
-      });
-      
+        expect(hideTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
+        expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
+        expect(hideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
+        expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
+      });      
     });
 
   });

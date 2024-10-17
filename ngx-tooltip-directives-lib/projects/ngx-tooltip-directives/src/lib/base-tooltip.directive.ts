@@ -153,7 +153,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
 
     @Output()
-    events: EventEmitter<any> = new EventEmitter<any>();
+    events = new EventEmitter<{ type: string, position: { top: number, left: number } | DOMRect }>();
 
 
     private refToTooltipComponent: ComponentRef<TooltipComponent> | undefined;
@@ -192,6 +192,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     }
 
     private clearTimeouts$ = new Subject<void>();
+    private unsubscribeInputListeners$ = new Subject<void>();
 	private destroy$ = new Subject<void>();
 
     constructor(
@@ -205,11 +206,11 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     ngOnInit(): void {
         // Map tooltip options:
         this.mergedOptions = this.getMergedTooltipOptions();
-        // Initialize listeners that capture mouse-, click- and scroll-events
-        this.initializeListeners();
+
+        this.subscribeToShowTriggers();
     }
 
-    ngOnChanges(changes: SimpleChanges) {
+    ngOnChanges(_: SimpleChanges) {
         // Map tooltip options:
         this.mergedOptions = this.getMergedTooltipOptions();
     }
@@ -222,121 +223,98 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         this.collectedOptions.contentType = contentType;
     }
 
-    private initializeListeners() {
-        if (this.isDisplayOnClick) {
-            this.listenToClickOnHostElement();
-        }
-
-        if (this.isDisplayOnHover) {
-            this.listenToInteractions();
-        }
-
-        // The tooltip-position needs to be adjusted when user resizes the window:
-        this.listenToResizeEvents();
-    }
-
     /* Public methods for library-users */
 
-	show() {
+	public show(isInvokedFromOutside = true) {
 		if (this.tooltipContent && this.contentType) {
+            // Stop all ongoing processes:
+            this.clearTimeouts$.next();
+            this.unsubscribeInputListeners$.next();
 
             if (this.tooltipComponent && !this.isTooltipComponentDestroyed) {
-                this.showTooltip();
+                this.setTooltipVisibility('visible');
+                // Subscribe to input-events:
+                if (!isInvokedFromOutside) {
+                    this.subscribeToHideTriggers();
+                    this.subscribeToResizeEvents();
+                }
             }
             else {
-                this.createTooltip();
-            }                
+                this.createTooltip(isInvokedFromOutside);
+            }
         }
 	}
 
-	hide() {
+	public hide(isInvokedFromOutside = true) {
         if (this.isTooltipVisible) {
-            this.hideTooltip();
+            // Stop all ongoing processes:
+            this.clearTimeouts$.next();
+            this.unsubscribeInputListeners$.next();
+
+            this.setTooltipVisibility('hidden');
+
+            // Subscribe to input-events:
+            if (!isInvokedFromOutside) {
+                this.subscribeToShowTriggers();
+            }
         }
 	}
 
 
     /** Private library-Methods **/
 
+    private subscribeToShowTriggers() {
+        const raceObservables = [];
 
-    /* Reacts only in 'isDisplayOnClick'-mode */
-    private listenToClicksOnTooltip(tooltipComponent: TooltipComponent) {        
-		tooltipComponent.userClickOnTooltip$
-			.pipe(
-                filter(() => this.isDisplayOnClick && this.isTooltipVisible),
-                tap(() => this.hideTooltip()),
-				takeUntil(this.destroy$)
-			)
-			.subscribe();
-	}
+        if (this.isDisplayOnHover) {
+            const mouseEnter$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseenter');
+            const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
+            raceObservables.push(mouseEnter$, focusIn$);
+        }
+        else if (this.isDisplayOnClick) {
+            const clickOnHostElement$ = fromEvent(this.hostElementRef.nativeElement, 'click');
+            raceObservables.push(clickOnHostElement$);
+        }
 
-    /* Reacts only in 'isDisplayOnClick'-mode */
-	private listenToClickOnHostElement() {
-        fromEvent(this.hostElementRef.nativeElement, 'click')
-            .pipe(
-                // 'throttleTime' emits a value from the source observable,
-                // then ignores subsequent source values for duration milliseconds, then repeats this process.
-				throttleTime(200),
-                filter(() => this.isDisplayOnClick),
-                map(() => { 
-                    if (this.isTooltipVisible) {
-                        this.hideTooltip();
-                        return false;
-                    }
-                    else {
-                        this.show();
-                        return true;
-                    }
-                }),
-                filter((isAboutToDisplayTooltip: boolean) => isAboutToDisplayTooltip && 
-                                                             !!this.mergedOptions.hideDelayAfterClick &&
-                                                             this.mergedOptions.hideDelayAfterClick > 0),
-                // Cancel pipe when further clicks on the host-element are made:
-                switchMap(() => {
-                    const obsHideTooltipAfterDelay = timer(this.mergedOptions.hideDelayAfterClick ?? 0)
-                                                        .pipe(tap(() => this.hideTooltip()));  
-                    // Make delay cancellable:                
-                    // Executes obsHideTooltipAfterDelay, given clearTimeouts$ isn't called before hideDelay has elapsed:
-                    return race(obsHideTooltipAfterDelay, this.clearTimeouts$);
-                }),
-                takeUntil(this.destroy$)
-            )
-            .subscribe();
-	}
+        race(raceObservables).pipe(
+            switchMap(() => {
+                this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
+                return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
+            }),
+            takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
+        )
+        .subscribe();
+    }
 
-    private listenToInteractions() {
-        const mouseEnter$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseenter');
-        const mouseLeave$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseleave');        
-        const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
-        const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
-        const scroll$ = fromEvent(document, 'scroll');
 
-        merge(mouseEnter$, mouseLeave$, focusIn$, focusOut$, scroll$)
-            .pipe(
-                filter((event) => this.isDisplayOnHover && (event instanceof MouseEvent || event.type === 'scroll')),
-                switchMap((event: Event) => {
+    private subscribeToHideTriggers() {
+        const raceObservables = [fromEvent(document, 'scroll')];
 
-                    if (event.type === 'mouseenter' || event.type === 'focusin') {
-                        this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
-                        return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
-                    }
-                    else if (event.type === 'mouseleave' ||
-                             event.type === 'focusout' ||
-                             (this.isTooltipVisible && event.type === 'scroll')) {
-
-                        this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
-                        return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
-                    }
-                    return EMPTY;  // Returns an empty observable when no action is needed
-                }),
-                takeUntil(this.destroy$)
-            )
-            .subscribe();
+        if (this.isDisplayOnHover) {
+            const mouseLeave$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseleave');
+            const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
+            raceObservables.push(mouseLeave$, focusOut$);
+        }
+        
+        // Only add `clickOutside$` if it is defined
+        if (this.tooltipComponent) {
+            const clickOutsideTooltip$ = this.tooltipComponent.userClickOutsideTooltip$;
+            raceObservables.push(clickOutsideTooltip$);
+        }
+        
+        race(raceObservables).pipe(
+            switchMap(() => {
+                this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
+                return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
+            }),
+            takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
+        )
+        .subscribe();
     }
 
 
     /* The tooltip-position needs to be adjusted when user resizes the window */
-	private listenToResizeEvents() {
+	private subscribeToResizeEvents() {
 		const resize$ = fromEvent(window, 'resize');
 
 		merge(resize$)
@@ -351,12 +329,12 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 						this.tooltipComponent.setPosition();
 					}
 				}),
-				takeUntil(this.destroy$),
+				takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
 			)
 			.subscribe();
 	}
 
-    private createTooltip() {
+    private createTooltip(isInvokedFromOutside: boolean) {
 		// Stop all ongoing processes:
 		this.clearTimeouts$.next();
 
@@ -366,7 +344,12 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 		  		takeUntil(this.destroy$ || this.clearTimeouts$),
 		  		tap(() => {
 					this.appendComponentToBody();
-					this.showTooltip();
+					this.setTooltipVisibility('visible');
+                    // Subscribe to input-events:
+                    if (!isInvokedFromOutside) {
+                        this.subscribeToHideTriggers();
+                        this.subscribeToResizeEvents();
+                    }
 				}),
 				takeUntil(this.destroy$)
 			)
@@ -377,7 +360,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         return timer(delayInMillis)
             .pipe(
                 takeUntil(this.clearTimeouts$),
-                tap(() => this.show())
+                tap(() => this.show(false))
             );
     }
 
@@ -385,7 +368,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         return timer(delayInMillis)
             .pipe(
                 takeUntil(this.clearTimeouts$),
-                tap(() => this.hideTooltip())
+                tap(() => this.hide(false))
             );
     }
 
@@ -394,11 +377,6 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         // This way the component is automatically added to the change detection cycle of the Angular application
         this.refToTooltipComponent = this.viewContainerRef.createComponent(TooltipComponent, { injector: this.injector });
         this.tooltipComponent = this.refToTooltipComponent.instance;
-
-        // Attach tooltip-click listener:
-        if (this.isDisplayOnClick) {
-            this.listenToClicksOnTooltip(this.tooltipComponent);
-        }
 
 		if(!this.tooltipComponent) { return; }     
       
@@ -409,62 +387,58 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         document.body.appendChild(domElemTooltip);
       
     	// Subscribe to events from the component.
-    	this.tooltipComponent?.events
+    	this.tooltipComponent?.visibilityChangeCompleted$
 			.pipe(
-				takeUntil(this.destroy$),
-				tap(eventType => {
-					eventType === 'shown' && this.events.emit({ type: 'shown', position: this.hostElementPosition });
-					eventType === 'hidden' && this.events.emit({ type: 'hidden', position: this.hostElementPosition });
-				})
+				tap(({ type }) => {
+					type === 'shown' && this.events.emit({ type: 'shown', position: this.hostElementPosition });
+					type === 'hidden' && this.events.emit({ type: 'hidden', position: this.hostElementPosition });
+				}),
+                takeUntil(this.destroy$)
 			)
             .subscribe();
     }
 
-	private showTooltip(): void {
-		if (this.tooltipComponent && this.tooltipContent && this.contentType) {
-			// Stop all ongoing processes:
-			this.clearTimeouts$.next();
+	private setTooltipVisibility(targetVisibility: 'visible' | 'hidden'): void {
+
+		if (targetVisibility === 'visible' && this.tooltipComponent && this.tooltipContent && this.contentType) {
 
             this.events.emit({ type: 'show', position: this.hostElementPosition });
 
             // Set the data property of the component instance
-            const tooltipData: TooltipDto = {
-                tooltipStr: this.contentType === 'string' ? this.tooltipContent as string : undefined,
-                tooltipHtml: this.contentType === 'html' ? this.tooltipContent : undefined,
-                tooltipTemplate: this.contentType === 'template' ? this.tooltipContent as TemplateRef<any> : undefined,
-                hostElement: this.hostElementRef.nativeElement,
-                hostElementPosition: this.hostElementPosition,
-                options: this.mergedOptions
-            };
-
-			this.triggerShowTooltipOnHostComponent(tooltipData);
+            const tooltipData: TooltipDto = this.assembleTooltipData();
+			this.showTooltipOnHostComponent(tooltipData);
 			this.isTooltipVisible = true;
 		}
+        else if (targetVisibility === 'hidden' && this.isTooltipVisible && !this.isTooltipComponentDestroyed) {
+
+            this.events.emit({ type: 'hide', position: this.hostElementPosition });
+
+            this.hideTooltipOnHostComponent();
+            this.isTooltipVisible = false;
+        }
 	}
 
-    private triggerShowTooltipOnHostComponent(tooltipData: TooltipDto) {
+    private showTooltipOnHostComponent(tooltipData: TooltipDto) {
         if (this.tooltipComponent) {
             this.tooltipComponent.showTooltip(tooltipData);
         }
     }
 
-	private hideTooltip(): void {
-		// Make sure no hiding-processes are ongoing:
-		this.clearTimeouts$?.next();
-
-    	if (this.isTooltipVisible && !this.isTooltipComponentDestroyed) {
-
-			this.events.emit({ type: 'hide', position: this.hostElementPosition });
-
-			this.triggerHideTooltipOnHostComponent();
-			this.isTooltipVisible = false;
-    	}
-	}
-
-    private triggerHideTooltipOnHostComponent() {
+    private hideTooltipOnHostComponent() {
         if (this.tooltipComponent) {
             this.tooltipComponent?.hideTooltip();
         }
+    }
+
+    private assembleTooltipData(): TooltipDto {
+        return {
+            tooltipStr: this.contentType === 'string' ? this.tooltipContent as string : undefined,
+            tooltipHtml: this.contentType === 'html' ? this.tooltipContent : undefined,
+            tooltipTemplate: this.contentType === 'template' ? this.tooltipContent as TemplateRef<any> : undefined,
+            hostElement: this.hostElementRef.nativeElement,
+            hostElementPosition: this.hostElementPosition,
+            options: this.mergedOptions
+        };
     }
 
 	private destroyTooltip(): void {
