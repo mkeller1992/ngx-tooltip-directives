@@ -264,19 +264,19 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     /** Private library-Methods **/
 
     private subscribeToShowTriggers() {
-        const raceObservables = [];
+        const raceObservables$ = [];
 
         if (this.isDisplayOnHover) {
             const mouseEnter$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseenter');
             const focusIn$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusin');
-            raceObservables.push(mouseEnter$, focusIn$);
+            raceObservables$.push(mouseEnter$, focusIn$);
         }
         else if (this.isDisplayOnClick) {
             const clickOnHostElement$ = fromEvent(this.hostElementRef.nativeElement, 'click');
-            raceObservables.push(clickOnHostElement$);
+            raceObservables$.push(clickOnHostElement$);
         }
 
-        race(raceObservables).pipe(
+        race(raceObservables$).pipe(
             switchMap(() => {
                 this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
                 return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
@@ -288,21 +288,21 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
 
     private subscribeToHideTriggers() {
-        const raceObservables = [fromEvent(document, 'scroll')];
+        const raceObservables$ = [fromEvent(document, 'scroll')];
 
         if (this.isDisplayOnHover) {
             const mouseLeave$ = fromEvent<MouseEvent>(this.hostElementRef.nativeElement, 'mouseleave');
             const focusOut$ = fromEvent<FocusEvent>(this.hostElementRef.nativeElement, 'focusout');
-            raceObservables.push(mouseLeave$, focusOut$);
+            raceObservables$.push(mouseLeave$, focusOut$);
         }
         
         // Only add `clickOutside$` if it is defined
         if (this.tooltipComponent) {
             const clickOutsideTooltip$ = this.tooltipComponent.userClickOutsideTooltip$;
-            raceObservables.push(clickOutsideTooltip$);
+            raceObservables$.push(clickOutsideTooltip$);
         }
         
-        race(raceObservables).pipe(
+        race(raceObservables$).pipe(
             switchMap(() => {
                 this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
                 return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
