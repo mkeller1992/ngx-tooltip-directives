@@ -122,6 +122,11 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     }
 
     @Input()
+    set minWidth(val: string) {
+        this.collectedOptions.minWidth = val;
+    }
+
+    @Input()
     set maxWidth(val: string) {
         this.collectedOptions.maxWidth = val;
     }

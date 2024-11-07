@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 import { ContentType } from './base-tooltip.directive';
@@ -51,6 +51,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	@HostBinding('style.padding') hostStylePadding!: string;
     @HostBinding('style.z-index') hostStyleZIndex!: number;
     @HostBinding('style.width') hostStyleWidth!: string;
+	@HostBinding('style.min-width') hostStyleMinWidth!: string;
     @HostBinding('style.max-width') hostStyleMaxWidth!: string;
     @HostBinding('style.pointer-events') hostStylePointerEvents!: string;
     @HostBinding('class.tooltip-shadow') hostClassShadow!: boolean;
@@ -313,6 +314,9 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		this.borderColor = options.borderColor ?? defaultOptions.borderColor!;
         this.hostClassShadow = options.shadow ?? true;
 
+		if (options.minWidth) {
+			this.hostStyleMinWidth = options.minWidth;
+		}
 		if (options.maxWidth) {
 			this.hostStyleMaxWidth = options.maxWidth;
 		}

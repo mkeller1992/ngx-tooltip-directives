@@ -24,6 +24,7 @@ export interface TooltipOptions {
     displayTouchscreen?: boolean;
     offset?: number;
     width?: string;
+    minWidth?: string;
     maxWidth?: string;
     hideDelayAfterClick?: number;
     pointerEvents?: "auto" | "none";
