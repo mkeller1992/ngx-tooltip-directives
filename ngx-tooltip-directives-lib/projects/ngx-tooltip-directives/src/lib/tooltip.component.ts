@@ -19,12 +19,11 @@ interface TooltipStyles {
 }
 
 @Component({
-	selector: 'tooltip',
-	templateUrl: './tooltip.component.html',
-	styleUrls: ['./tooltip.component.scss'],
-	standalone: true,
-	imports: [CommonModule]
-  })
+    selector: 'tooltip',
+    templateUrl: './tooltip.component.html',
+    styleUrls: ['./tooltip.component.scss'],
+    imports: [CommonModule]
+})
   
 
 export class TooltipComponent implements OnInit, OnDestroy {
