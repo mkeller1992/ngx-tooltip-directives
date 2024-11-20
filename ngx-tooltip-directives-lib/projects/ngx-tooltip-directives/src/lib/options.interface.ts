@@ -18,7 +18,7 @@ export interface TooltipOptions {
     zIndex?: number;
     animationDuration?: number;
     animationDurationDefault?: number;
-    trigger?: "hover" | "click" | "programmatically";
+    trigger?: "hover" | "click";
     tooltipClass?: string;
     display?: boolean;
     displayTouchscreen?: boolean;
