@@ -6,7 +6,7 @@
 
 This library offers three different tooltip directives (string, html and template) and draws inspiration from the no longer maintained ng2-tooltip-directive.
 
-The latest library version is compatible with **Angular 18**.
+The latest library version is compatible with **Angular 19**.
 
 Tooltips are informative pop-up tips that appear when you hover over or click on an item, providing helpful additional information or guidance.
 
