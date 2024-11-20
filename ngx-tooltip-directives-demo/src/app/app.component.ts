@@ -8,7 +8,6 @@ import packageJson from '../../package.json';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
     imports: [TooltipStrDirective, TooltipHtmlDirective, TooltipTemplateDirective, AngularDraggableModule]
 })
 
