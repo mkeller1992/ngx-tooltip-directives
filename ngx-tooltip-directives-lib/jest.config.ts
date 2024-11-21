@@ -3,7 +3,7 @@ module.exports = {
     preset: 'jest-preset-angular',
     maxWorkers: "4", // Use 4 threads for parallel test runs
     testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/projects/ngx-tooltip-directives/src/jest.setup.ts'],
+    setupFilesAfterEnv: ['<rootDir>/projects/ngx-tooltip-directives/src/setup-jest.ts'],
     testPathIgnorePatterns: [
       '<rootDir>/node_modules/',
       '<rootDir>/dist/',

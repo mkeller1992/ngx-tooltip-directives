@@ -4,6 +4,7 @@ import { By, SafeHtml } from "@angular/platform-browser";
 import { TooltipHtmlDirective } from './tooltip-html.directive';
 
 @Component({
+    standalone: false,
     template: `<div [tooltipHtml]="testHtml"></div>`
   })
 

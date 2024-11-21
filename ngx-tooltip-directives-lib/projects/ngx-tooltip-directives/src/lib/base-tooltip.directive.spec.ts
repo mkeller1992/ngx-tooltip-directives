@@ -470,6 +470,7 @@ import { TooltipOptions } from './options.interface';
   /* Mock Components */
 
   @Component({
+    standalone: false,
     template: `
       <button type="button"
         [tooltipStr]="'Tooltip String Text'">
@@ -479,6 +480,7 @@ import { TooltipOptions } from './options.interface';
   class HostWithStrTooltipComponent {}
   
   @Component({
+    standalone: false,
     template: `<button type="button" [tooltipHtml]="safeTooltipHtml">Button with Html Tooltip</button>`
   })
   class HostWithHtmlTooltipComponent {
@@ -493,6 +495,7 @@ import { TooltipOptions } from './options.interface';
   }
   
   @Component({
+    standalone: false,
     template: `
       <button type="button"
         [tooltipStr]="'Tooltip String Text'"

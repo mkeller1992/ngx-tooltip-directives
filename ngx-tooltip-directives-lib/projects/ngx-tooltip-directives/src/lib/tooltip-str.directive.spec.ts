@@ -4,6 +4,7 @@ import { By } from "@angular/platform-browser";
 import { TooltipStrDirective } from './tooltip-str.directive';
 
 @Component({
+    standalone: false,
     template: `<div [tooltipStr]="testStr"></div>`
 })
 class HostComponent {

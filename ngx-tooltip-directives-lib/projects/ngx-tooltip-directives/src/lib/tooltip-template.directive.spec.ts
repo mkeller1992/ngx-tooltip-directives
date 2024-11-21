@@ -4,6 +4,7 @@ import { By } from "@angular/platform-browser";
 import { TooltipTemplateDirective } from './tooltip-template.directive';
 
 @Component({
+    standalone: false,
     template: `
         <ng-template #templateRef>
             Initial Tooltip
