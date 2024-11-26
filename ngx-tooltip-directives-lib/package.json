@@ -1,6 +1,6 @@
 {
   "name": "ngx-tooltip-directives-lib",
-  "version": "18.2.1",
+  "version": "19.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
