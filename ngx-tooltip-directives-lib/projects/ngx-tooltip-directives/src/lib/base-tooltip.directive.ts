@@ -15,7 +15,8 @@ export type ContentType = "string" | "html" | "template";
 export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestroy {
 
     // Will be populated by child-directive
-    tooltipContent!: string | SafeHtml | TemplateRef<any>;
+    private _tooltipContent!: string | SafeHtml | TemplateRef<any>;
+    private _tooltipContext: any | undefined;
 
     get contentType(): ContentType | undefined {
         return this.mergedOptions.contentType;
@@ -224,14 +225,19 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
     setTooltipContent(tooltipContent: string | SafeHtml | TemplateRef<any>, contentType: ContentType) {
         // Set user-inputs:
-        this.tooltipContent = tooltipContent;
+        this._tooltipContent = tooltipContent;
         this.collectedOptions.contentType = contentType;
+    }
+
+    setTooltipContext(tooltipContext: any | undefined) {
+        // Set user-inputs:
+        this._tooltipContext = tooltipContext;
     }
 
     /* Public methods for library-users */
 
 	public show(isInvokedFromOutside = true) {
-		if (this.tooltipContent && this.contentType) {
+		if (this._tooltipContent && this.contentType) {
             // Stop all ongoing processes:
             this.clearTimeouts$.next();
             this.unsubscribeInputListeners$.next();
@@ -405,7 +411,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
 	private setTooltipVisibility(targetVisibility: 'visible' | 'hidden'): void {
 
-		if (targetVisibility === 'visible' && this.tooltipComponent && this.tooltipContent && this.contentType) {
+		if (targetVisibility === 'visible' && this.tooltipComponent && this._tooltipContent && this.contentType) {
 
             this.events.emit({ type: 'show', position: this.hostElementPosition });
 
@@ -437,9 +443,10 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 
     private assembleTooltipData(): TooltipDto {
         return {
-            tooltipStr: this.contentType === 'string' ? this.tooltipContent as string : undefined,
-            tooltipHtml: this.contentType === 'html' ? this.tooltipContent : undefined,
-            tooltipTemplate: this.contentType === 'template' ? this.tooltipContent as TemplateRef<any> : undefined,
+            tooltipStr: this.contentType === 'string' ? this._tooltipContent as string : undefined,
+            tooltipHtml: this.contentType === 'html' ? this._tooltipContent : undefined,
+            tooltipTemplate: this.contentType === 'template' ? this._tooltipContent as TemplateRef<any> : undefined,
+            tooltipContext: this.contentType === 'template' ? this._tooltipContext : undefined,
             hostElement: this.hostElementRef.nativeElement,
             hostElementPosition: this.hostElementPosition,
             options: this.mergedOptions

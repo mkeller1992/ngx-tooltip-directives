@@ -4,6 +4,12 @@
 	</div>
 </ng-template>
 
+<ng-template #tooltipTemplateWithContext let-numberOfLessons="estimate">
+    <div style="color: green; font-weight: bold;"> 
+        Approximately <span style="color: red">{{ numberOfLessons }}</span> lessons
+    </div>
+</ng-template>
+
 
 <div class="main-content">
 
@@ -31,6 +37,15 @@
     <h3>tooltipTemplate</h3>
     <p>
         <button class="btn btn-small btn-outline btn-rounded" [tooltipTemplate]="tooltipTemplate" placement="right">Tooltip Template</button>
+    </p>
+
+    <h3>tooltipTemplate with tooltipContext</h3>
+    <p>
+        <button class="btn btn-small btn-outline btn-rounded"
+                [tooltipTemplate]="tooltipTemplateWithContext"
+                [tooltipContext]="context"
+                placement="right">Tooltip Template with context
+        </button>
     </p>
 
     <h3>textColor, backgroundColor, borderColor</h3>

@@ -34,7 +34,6 @@ import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } f
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
     imports: [TooltipStrDirective, TooltipHtmlDirective, TooltipTemplateDirective]
 })
 ```
@@ -90,6 +89,26 @@ export class AppComponent {
 <div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
+
+Use template with `tooltipContext`:
+
+```ts
+context = { estimate: 10 };
+```
+
+```html
+<ng-template #myTemplate let-numberOfLessons="estimate">
+  <div style="color: blue; font-weight: bold;">
+    {{ numberOfLessons }} lessons
+  </div>
+</ng-template>
+
+<div [tooltipTemplate]="myTemplate"
+     [tooltipContext]="context">
+     Show Tooltip Template with Context
+</div>
+```
+
 ---
 
 ## Trigger tooltip programmatically

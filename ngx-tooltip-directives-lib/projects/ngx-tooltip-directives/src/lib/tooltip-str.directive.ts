@@ -4,7 +4,6 @@ import { BaseTooltipDirective } from "./base-tooltip.directive";
 @Directive({
     selector: '[tooltipStr]',
     exportAs: 'tooltipStr',
-    standalone: true
 })
 
 export class TooltipStrDirective extends BaseTooltipDirective {

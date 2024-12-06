@@ -7,6 +7,7 @@ export interface TooltipDto {
 	tooltipStr?: string;
 	tooltipHtml?: SafeHtml;
 	tooltipTemplate?: TemplateRef<any>;
+	tooltipContext?: any;
 	hostElement: any;
 	hostElementPosition: { top: number, left: number } | DOMRect;
 	options: TooltipOptions;

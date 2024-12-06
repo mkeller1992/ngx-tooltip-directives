@@ -6,7 +6,6 @@ import { BaseTooltipDirective } from "./base-tooltip.directive";
 @Directive({
     selector: '[tooltipHtml]',
     exportAs: 'tooltipHtml',
-    standalone: true
 })
 
 export class TooltipHtmlDirective extends BaseTooltipDirective {

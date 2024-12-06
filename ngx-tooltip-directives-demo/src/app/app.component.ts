@@ -22,6 +22,8 @@ export class AppComponent implements OnInit {
   tooltipHtml: string = '<div>This is a <strong>tooltip</strong> with HTML</div>';
   safeTooltipHtml!: SafeHtml;
 
+  context = { estimate: 10 };
+
   constructor(private sanitizer: DomSanitizer){ }
 
   ngOnInit(): void {

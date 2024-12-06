@@ -14,7 +14,7 @@
     }
 	@case ('template') {
 		<div>
-			<ng-container *ngTemplateOutlet="tooltipTemplate"></ng-container>
+			<ng-container *ngTemplateOutlet="tooltipTemplate; context: this.tooltipContext"></ng-container>
 		</div>
     }
 }

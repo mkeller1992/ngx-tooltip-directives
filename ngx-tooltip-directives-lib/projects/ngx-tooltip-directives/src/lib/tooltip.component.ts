@@ -63,6 +63,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
     tooltipStr!: string;
     tooltipHtml!: SafeHtml;
     tooltipTemplate!: TemplateRef<any>;
+	tooltipContext: any | undefined;
 
 	prioritizedPlacements: Placement[] = [ 'bottom', 'right', 'top', 'left', 'bottom-left', 'top-left' ];
 
@@ -169,6 +170,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		}
 		if (this.currentContentType === 'template' && config.tooltipTemplate) {
 			this.tooltipTemplate = config.tooltipTemplate;
+			this.tooltipContext = config.tooltipContext;
 		}
 
 		this.hostElement = config.hostElement;

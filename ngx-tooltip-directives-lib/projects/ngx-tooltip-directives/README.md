@@ -34,7 +34,6 @@ import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } f
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
     imports: [TooltipStrDirective, TooltipHtmlDirective, TooltipTemplateDirective]
 })
 ```
@@ -90,6 +89,26 @@ export class AppComponent {
 <div [tooltipTemplate]="myTemplate" placement="right">Show Tooltip Template</div>
 
 ```
+
+Use template with `tooltipContext`:
+
+```ts
+context = { estimate: 10 };
+```
+
+```html
+<ng-template #myTemplate let-numberOfLessons="estimate">
+  <div style="color: blue; font-weight: bold;">
+    {{ numberOfLessons }} lessons
+  </div>
+</ng-template>
+
+<div [tooltipTemplate]="myTemplate"
+     [tooltipContext]="context">
+     Show Tooltip Template with Context
+</div>
+```
+
 ---
 
 ## Trigger tooltip programmatically
@@ -209,7 +228,7 @@ Events are called in accordance with the delays specified in the options within 
 
 | Event            | Description                                                                                 |
 |------------------|---------------------------------------------------------------------------------------------|
-| {type: "show", position: { top: number; left: number; } | DOMRect} | This event is fired prior to the tooltip's appearance. |
+| {type: "show", position: { top: number; left: number; } | DOMRect } | This event is fired prior to the tooltip's appearance. |
 | {type: "shown", position: { top: number; left: number; } | DOMRect} | This event is fired following the tooltip's appearance animation. |
 | {type: "hide", position: { top: number; left: number; } | DOMRect} | This event is fired prior to the tooltip being hidden. |
 | {type: "hidden", position: { top: number; left: number; } | DOMRect} | This event is fired after the tooltip hiding animation completes. |  
