@@ -42,6 +42,6 @@ describe('TooltipTemplateDirective', () => {
                                         .query(By.directive(TooltipTemplateDirective))
                                         .injector
                                         .get(TooltipTemplateDirective);
-        expect(tooltipDirective.tooltipContent).toEqual(templateInput);
+        expect((tooltipDirective as any)._tooltipContent).toEqual(templateInput);
     });
 });

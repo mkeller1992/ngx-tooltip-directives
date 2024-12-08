@@ -35,7 +35,7 @@ import { TooltipHtmlDirective } from './tooltip-html.directive';
                                         .query(By.directive(TooltipHtmlDirective))
                                         .injector
                                         .get(TooltipHtmlDirective);
-        expect(tooltipDirective.tooltipContent).toBe('<div>Initial tooltip</div>');
+        expect((tooltipDirective as any)._tooltipContent).toBe('<div>Initial tooltip</div>');
     });
 
     it('should override tooltip with HTML content', () => {
@@ -51,6 +51,6 @@ import { TooltipHtmlDirective } from './tooltip-html.directive';
                                         .query(By.directive(TooltipHtmlDirective))
                                         .injector
                                         .get(TooltipHtmlDirective);                                       
-        expect(tooltipDirective.tooltipContent).toBe(htmlInput);
+        expect((tooltipDirective as any)._tooltipContent).toBe(htmlInput);
     });
 });

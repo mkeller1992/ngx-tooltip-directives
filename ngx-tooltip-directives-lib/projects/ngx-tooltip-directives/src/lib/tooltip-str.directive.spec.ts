@@ -34,7 +34,7 @@ describe('TooltipStrDirective', () => {
                                         .query(By.directive(TooltipStrDirective))
                                         .injector
                                         .get(TooltipStrDirective);
-        expect(tooltipDirective.tooltipContent).toBe('Initial tooltip');
+        expect((tooltipDirective as any)._tooltipContent).toBe('Initial tooltip');
     });
 
     it('should override tooltip with string content', () => {
@@ -50,6 +50,6 @@ describe('TooltipStrDirective', () => {
                                         .query(By.directive(TooltipStrDirective))
                                         .injector
                                         .get(TooltipStrDirective);
-        expect(tooltipDirective.tooltipContent).toBe(strInput);
+        expect((tooltipDirective as any)._tooltipContent).toBe(strInput);
     });
 });
