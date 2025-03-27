@@ -1,6 +1,6 @@
 import { ApplicationRef, ComponentRef, Directive, ElementRef, EventEmitter, Inject, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
-import { auditTime, EMPTY, filter, first, fromEvent, map, merge, race, Subject, switchMap, takeUntil, tap, throttleTime, timer } from 'rxjs';
+import { auditTime, filter, first, fromEvent, map, merge, race, Subject, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { defaultOptions } from './default-options.const';
 import { TooltipOptions } from './options.interface';
 import { TooltipOptionsService } from './options.service';
@@ -394,8 +394,16 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
         // Get the DOM element from the component's view.
         const domElemTooltip = (this.refToTooltipComponent.location.nativeElement as HTMLElement);
       
-        // Append the DOM element to the document body.
-        document.body.appendChild(domElemTooltip);
+        // Get the host element from hostElementRef.
+        const hostElem = this.hostElementRef.nativeElement;
+
+        if (hostElem) {
+            // Append the DOM element (tooltip) to the host element.
+            hostElem.appendChild(domElemTooltip);
+        } else {
+            console.warn('Host element not found, appending to body instead.');
+            document.body.appendChild(domElemTooltip); // fallback if host element is not available
+        }
       
     	// Subscribe to events from the component.
     	this.tooltipComponent?.visibilityChangeCompleted$
