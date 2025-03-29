@@ -164,7 +164,7 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
 
         strTooltipDirectiveInstance['tooltipComponent'] = {
-          setPosition() {}
+          setPosition(isFixedPosition: boolean) {}
         } as TooltipComponent;
         
         const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');

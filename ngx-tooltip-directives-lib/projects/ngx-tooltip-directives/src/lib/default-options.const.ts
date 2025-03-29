@@ -25,4 +25,5 @@ export const defaultOptions: TooltipOptions = {
 	offset: 8,
 	maxWidth: '200px',
 	pointerEvents: 'auto', // 'none' would mean that there is no reaction to clicks
+	appendTooltipToBody: true
 }

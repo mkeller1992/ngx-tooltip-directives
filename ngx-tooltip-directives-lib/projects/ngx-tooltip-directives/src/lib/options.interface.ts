@@ -1,5 +1,5 @@
-import { Placement } from "./placement.type";
 import { ContentType } from "./base-tooltip.directive";
+import { Placement } from "./placement.type";
 
 export interface TooltipOptions {
     id?: string | number;
@@ -29,4 +29,5 @@ export interface TooltipOptions {
     hideDelayAfterClick?: number;
     pointerEvents?: "auto" | "none";
     position?: {top: number, left: number};
+	appendTooltipToBody?: boolean;
 }
