@@ -41,10 +41,3 @@ jobs:
       - name: Run Tests
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
-
-      # Report test coverage (for badge on npm-library-mainpage)
-#      - name: Upload coverage reports to Codecov
-#        uses: codecov/codecov-action@v4.0.1
-#        with:
-#          token: ${{ env.CODECOV_TOKEN }}
-#          slug: mkeller1992/ngx-tooltip-directives

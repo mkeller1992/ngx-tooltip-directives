@@ -41,51 +41,7 @@ jobs:
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
 
-      # Report test coverage (for badge on npm-library-mainpage)
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ env.CODECOV_TOKEN }}
-          slug: mkeller1992/ngx-tooltip-directives
-
       # Build the library from the specified subdirectory
       - name: Build Library
         run: npx ng build
         working-directory: ${{ env.BASE_DIR }}/projects/${{ env.PROJECT_NAME }}
-
-      # Check if version has been updated
-      - name: Check if version has been updated
-        id: check_version
-        run: |
-          # Extract the current version from package.json
-          PACKAGE_NAME=$(jq -r '.name' package.json)
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-
-          LATEST_PUBLISHED_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
-          if [ "$CURRENT_VERSION" = "$LATEST_PUBLISHED_VERSION" ]; then
-            echo "Version $CURRENT_VERSION is already published. Skipping publish..."
-            echo "execute_publish=false" >> $GITHUB_ENV
-          else
-            echo "Version $CURRENT_VERSION is new. Proceeding with publish..."
-            echo "execute_publish=true" >> $GITHUB_ENV
-          fi
-        working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
-
-      # Publish the library to npm if the version has been updated      
-      - name: Publish to npm
-        if: env.execute_publish == 'true'
-        run: npm publish
-        working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
-
-      # Set a version-tag for the deployed commit
-      - name: Set a version-tag for the commit to the specified branch
-        if: env.execute_publish == 'true' && success()
-        run: |
-          # Set a tag of the form 'v-0.0.0-lib' on the specified branch
-          git tag v${{ env.CURRENT_VERSION }}-lib
-          git push origin v${{ env.CURRENT_VERSION }}-lib
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
