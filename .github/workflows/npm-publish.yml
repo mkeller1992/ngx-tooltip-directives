@@ -72,7 +72,7 @@ jobs:
           fi
         working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
 
-      # Publish the library to npm if the version has been updated      
+      # Publish the library to npm if the version has been updated
       - name: Publish to npm
         if: env.execute_publish == 'true'
         run: npm publish
