@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and link ngx-tooltip-directives
         run: |
-          (cd ./${{ env.LIB_FOLDER_NAME }} && npm install && npm run build && npm link)
+          (cd ../${{ env.LIB_FOLDER_NAME }} && npm install && npm run build && npm link)
 
       - name: Install Dependencies
         run: npm install
