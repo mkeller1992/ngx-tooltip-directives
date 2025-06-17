@@ -1,0 +1,50 @@
+name: Test CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - feature/*
+      - fix/*
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    # Set all constants here
+    env:      
+      BASE_DIR: ./ngx-tooltip-directives-lib
+      PROJECT_NAME: ngx-tooltip-directives
+      # 1.) Register TOKEN on npm-website: Access Tokens > Generate New Token > Classic Token > Automation
+      # 2.) Store it on GitHub-website: repository > Settings > Secrets and variables > New repository secret
+      # NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_FOR_TOOLTIP_LIB }}
+      # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    steps:
+      # Checkout the repository to the runner
+      - uses: actions/checkout@v4
+
+      # Install jq tool for JSON processing
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      # Setup Node.js environment
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Install dependencies at the root level
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ${{ env.BASE_DIR }}
+
+      # Run tests at the root level
+      - name: Run Tests
+        run: npm run test:ci
+        working-directory: ${{ env.BASE_DIR }}
+
+      # Report test coverage (for badge on npm-library-mainpage)
+#      - name: Upload coverage reports to Codecov
+#        uses: codecov/codecov-action@v4.0.1
+#        with:
+#          token: ${{ env.CODECOV_TOKEN }}
+#          slug: mkeller1992/ngx-tooltip-directives
