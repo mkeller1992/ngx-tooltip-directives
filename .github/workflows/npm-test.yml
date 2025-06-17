@@ -7,7 +7,7 @@ on:
       - fix/*
 
 jobs:
-  build-and-publish:
+  testing-pipeline:
     runs-on: ubuntu-latest
     # Set all constants here
     env:      
