@@ -1,12 +1,13 @@
-name: CI/CD Pipeline
+name: Test CI/CD Pipeline
 
 on:
   push:
     branches:
-      - master
+      - feature/*
+      - fix/*
 
 jobs:
-  build-and-publish:
+  testing-pipeline:
     runs-on: ubuntu-latest
     # Set all constants here
     env:      
@@ -14,8 +15,8 @@ jobs:
       PROJECT_NAME: ngx-tooltip-directives
       # 1.) Register TOKEN on npm-website: Access Tokens > Generate New Token > Classic Token > Automation
       # 2.) Store it on GitHub-website: repository > Settings > Secrets and variables > New repository secret
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_FOR_TOOLTIP_LIB }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      # NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_FOR_TOOLTIP_LIB }}
+      # CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       # Checkout the repository to the runner
       - uses: actions/checkout@v4
@@ -40,8 +41,3 @@ jobs:
       - name: Run Tests
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
-
-      # Build the library from the specified subdirectory
-      - name: Build Library
-        run: npx ng build
-        working-directory: ${{ env.BASE_DIR }}/projects/${{ env.PROJECT_NAME }}
