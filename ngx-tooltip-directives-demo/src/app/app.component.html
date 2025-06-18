@@ -1,159 +1,159 @@
 <ng-template #tooltipTemplate>
-	<div style="color: blue; font-weight: bold;">
-        Tooltip Template
-	</div>
+  <div style="color: blue; font-weight: bold;">
+    Tooltip Template
+  </div>
 </ng-template>
 
 <ng-template #tooltipTemplateWithContext let-numberOfLessons="estimate">
-    <div style="color: green; font-weight: bold;"> 
-        Approximately <span style="color: red">{{ numberOfLessons }}</span> lessons
-    </div>
+  <div style="color: green; font-weight: bold;">
+    Approximately <span style="color: red">{{ numberOfLessons }}</span> lessons
+  </div>
 </ng-template>
 
 
 <div class="main-content">
 
-    <h1>{{ title }}</h1>
+  <h1>{{ title }}</h1>
 
-    <hr>
+  <hr>
 
-    <h2>{{ subTitle }}</h2>
+  <h2>{{ subTitle }}</h2>
 
-    <h3>placement</h3>
-    <p>    
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the right" placement="right">Right</button>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the top" placement="top">Top</button>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the bottom" placement="bottom">Bottom</button>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the left" placement="left">Left</button>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the top-left" placement="top-left">Top-Left</button>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the bottom-left" placement="bottom-left">Bottom-Left</button>
-    </p>
+  <h3>placement</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the right" placement="right">Right</button>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the top" placement="top">Top</button>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the bottom" placement="bottom">Bottom</button>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the left" placement="left">Left</button>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the top-left" placement="top-left">Top-Left</button>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Tooltip on the bottom-left" placement="bottom-left">Bottom-Left</button>
+  </p>
 
-    <h3>tooltipHtml</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" [tooltipHtml]="safeTooltipHtml" placement="right">Html Tooltip</button>
-    </p>
+  <h3>tooltipHtml</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" [tooltipHtml]="safeTooltipHtml" placement="right">Html Tooltip</button>
+  </p>
 
-    <h3>tooltipTemplate</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" [tooltipTemplate]="tooltipTemplate" placement="right">Tooltip Template</button>
-    </p>
+  <h3>tooltipTemplate</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" [tooltipTemplate]="tooltipTemplate" placement="right">Tooltip Template</button>
+  </p>
 
-    <h3>tooltipTemplate with tooltipContext</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded"
-                [tooltipTemplate]="tooltipTemplateWithContext"
-                [tooltipContext]="context"
-                placement="right">Tooltip Template with context
-        </button>
-    </p>
+  <h3>tooltipTemplate with tooltipContext</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded"
+            [tooltipTemplate]="tooltipTemplateWithContext"
+            [tooltipContext]="context"
+            placement="right">Tooltip Template with context
+    </button>
+  </p>
 
-    <h3>textColor, backgroundColor, borderColor</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" [textColor]="'red'" [backgroundColor]="'yellow'" [borderColor]="'black'" tooltipStr="Red font with yellow bg and black border-color" placement="right">Customized colors</button>
-    </p>
+  <h3>textColor, backgroundColor, borderColor</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" [textColor]="'red'" [backgroundColor]="'yellow'" [borderColor]="'black'" tooltipStr="Red font with yellow bg and black border-color" placement="right">Customized colors</button>
+  </p>
 
-    <h3>textAlign</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" textAlign="left" tooltipStr="Text align left - Quite long text" maxWidth="80px" placement="right">Text align left</button>
-        <button class="btn btn-small btn-outline btn-rounded" textAlign="center" tooltipStr="Text align center - Quite long text" maxWidth="80px" placement="right">Text align center</button>
-        <button class="btn btn-small btn-outline btn-rounded" textAlign="right" tooltipStr="Text align right - Quite long text" maxWidth="80px" placement="right">Text align right</button>
-    </p>
+  <h3>textAlign</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" textAlign="left" tooltipStr="Text align left - Quite long text" maxWidth="80px" placement="right">Text align left</button>
+    <button class="btn btn-small btn-outline btn-rounded" textAlign="center" tooltipStr="Text align center - Quite long text" maxWidth="80px" placement="right">Text align center</button>
+    <button class="btn btn-small btn-outline btn-rounded" textAlign="right" tooltipStr="Text align right - Quite long text" maxWidth="80px" placement="right">Text align right</button>
+  </p>
 
-    <h3>autoPlacement</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" ngDraggable [autoPlacement]="true" tooltipStr="Drag me anywhere and see the adjustment of the tooltip auto placing">Drag me</button>
-    </p>
+  <h3>autoPlacement</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" ngDraggable [autoPlacement]="true" tooltipStr="Drag me anywhere and see the adjustment of the tooltip auto placing">Drag me</button>
+  </p>
 
-    <h3>showDelay</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Show delay 1000ms" placement="left" [showDelay]="1000">Show delay 1000ms</button>
-    </p>
+  <h3>showDelay</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Show delay 1000ms" placement="left" [showDelay]="1000">Show delay 1000ms</button>
+  </p>
 
-    <h3>hideDelay</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Hide delay 1000ms" placement="left" [hideDelay]="1000">Hide delay 1000ms</button>
-    </p>
+  <h3>hideDelay</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Hide delay 1000ms" placement="left" [hideDelay]="1000">Hide delay 1000ms</button>
+  </p>
 
-    <h3>padding</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Padding 5px 8px" padding="5px 8px" placement="left">Padding 5px 8px</button>
-    </p>
+  <h3>padding</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Padding 5px 8px" padding="5px 8px" placement="left">Padding 5px 8px</button>
+  </p>
 
-    <h3>display</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Display false" [display]="false">Display false</button>
-    </p>
+  <h3>display</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Display false" [display]="false">Display false</button>
+  </p>
 
-    <h3>zIndex</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="zIndex 500" [zIndex]="500">zIndex 500</button>
-    </p>
+  <h3>zIndex</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="zIndex 500" [zIndex]="500">zIndex 500</button>
+  </p>
 
-    <h3>trigger</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Trigger click" trigger="click">Trigger click</button>
-    </p>
+  <h3>trigger</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Trigger click" trigger="click">Trigger click</button>
+  </p>
 
-    <h3>tooltipClass</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Custom class" tooltipClass="custom-class">Custom class</button>
-    </p>
+  <h3>tooltipClass</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Custom class" tooltipClass="custom-class">Custom class</button>
+  </p>
 
-    <h3>animationDuration</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Animation duration 1000ms" [animationDuration]="1000">Animation duration 1000ms</button>
-    </p>
+  <h3>animationDuration</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Animation duration 1000ms" [animationDuration]="1000">Animation duration 1000ms</button>
+  </p>
 
-    <h3>shadow</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Shadowless" [shadow]="false">Shadowless</button>
-    </p>
+  <h3>shadow</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Shadowless" [shadow]="false">Shadowless</button>
+  </p>
 
-    <h3>offset</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Offset 15px" [offset]="15">Offset 15px</button>
-    </p>
+  <h3>offset</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Offset 15px" [offset]="15">Offset 15px</button>
+  </p>
 
-    <h3>width</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Width 100 pixels" width="100px">Width 100 pixels</button>
-    </p>
+  <h3>width</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Width 100 pixels" width="100px">Width 100 pixels</button>
+  </p>
 
-    <h3>maxWidth</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Max width 100 pixels" maxWidth="100px">Max width 100 pixels</button>
-    </p>
+  <h3>maxWidth</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Max width 100 pixels" maxWidth="100px">Max width 100 pixels</button>
+  </p>
 
-    <h3>pointerEvents</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="pointerEvents: none" pointerEvents="none">pointerEvents: none</button>
-    </p>
+  <h3>pointerEvents</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="pointerEvents: none" pointerEvents="none">pointerEvents: none</button>
+  </p>
 
-    <h3>position</h3>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Custom position" [position]="{top: 500, left: 150}">Custom position</button>
-    </p>
+  <h3>position</h3>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="Custom position" [position]="{top: 500, left: 150}">Custom position</button>
+  </p>
 
-    <hr>
+  <hr>
 
-    <h2>Methods</h2>
-    <div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
+  <h2>Methods</h2>
+  <div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
 
-    <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.show()">show()</button>
-    <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.hide()">hide()</button>
+  <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.show()">show()</button>
+  <button class="btn btn-small btn-outline btn-rounded" (click)="myTooltip.hide()">hide()</button>
 
 
-    <div tooltip [tooltipStr]="'Tooltip text'" #tooltipProgrammatically="tooltipStr"></div>
+  <div tooltip [tooltipStr]="'Tooltip text'" #tooltipProgrammatically="tooltipStr"></div>
 
-    <button class="btn btn-small btn-outline btn-rounded" (click)="show()">show() via component.ts</button>
-    <button class="btn btn-small btn-outline btn-rounded" (click)="hide()">hide() via component.ts</button>
+  <button class="btn btn-small btn-outline btn-rounded" (click)="show()">show() via component.ts</button>
+  <button class="btn btn-small btn-outline btn-rounded" (click)="hide()">hide() via component.ts</button>
 
-    <hr>
+  <hr>
 
-    <h2>Events</h2>
-    <p>
-        <button class="btn btn-small btn-outline btn-rounded" tooltipStr="See console log" (events)="handleTooltipEvents($event)">Show</button>
-    </p>
+  <h2>Events</h2>
+  <p>
+    <button class="btn btn-small btn-outline btn-rounded" tooltipStr="See console log" (events)="handleTooltipEvents($event)">Show</button>
+  </p>
 
 </div>
