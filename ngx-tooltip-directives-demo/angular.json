@@ -74,9 +74,6 @@
             }
           },
           "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest"
         }
       }
     }
