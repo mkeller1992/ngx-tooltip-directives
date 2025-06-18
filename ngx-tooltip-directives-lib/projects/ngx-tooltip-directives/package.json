@@ -23,8 +23,8 @@
     "url": "https://github.com/mkeller1992/ngx-tooltip-directives/issues"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.3",
-    "@angular/core": "^20.0.3",
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
     "rxjs": "~7.8.2"
   },
   "dependencies": {
