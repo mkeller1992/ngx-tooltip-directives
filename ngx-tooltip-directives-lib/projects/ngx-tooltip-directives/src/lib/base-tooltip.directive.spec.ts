@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By, DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { BaseTooltipDirective } from './base-tooltip.directive';
-import { TooltipStrDirective } from './tooltip-str.directive';
-import { TooltipHtmlDirective } from './tooltip-html.directive';
-import { TooltipComponent } from './tooltip.component';
-import { TooltipOptions } from './options.interface';
+import {Component} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {By, DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {BaseTooltipDirective} from './base-tooltip.directive';
+import {TooltipStrDirective} from './tooltip-str.directive';
+import {TooltipHtmlDirective} from './tooltip-html.directive';
+import {TooltipComponent} from './tooltip.component';
+import {TooltipOptions} from './options.interface';
 
 
 describe('BaseTooltipDirective', () => {
@@ -66,7 +66,7 @@ describe('BaseTooltipDirective', () => {
 
       /* Arrange */
       const setTooltipContentSpy = jest.spyOn(BaseTooltipDirective.prototype, 'setTooltipContent');
-      const expectedTooltipContent = {"changingThisBreaksApplicationSecurity": "<div>This is a <strong>tooltip</strong> with HTML</div>"};
+      const expectedTooltipContent = {'changingThisBreaksApplicationSecurity': '<div>This is a <strong>tooltip</strong> with HTML</div>'};
 
       /* Act */
       fixtureHtmlTooltip.detectChanges();
@@ -108,7 +108,7 @@ describe('BaseTooltipDirective', () => {
       expect(mergedOptions.hideDelay).toBe(222);
       expect(mergedOptions.hideDelayAfterClick).toBe(111);
       expect(mergedOptions.pointerEvents).toBe('none');
-      expect(mergedOptions.position).toEqual({ top: 23, left: 25 });
+      expect(mergedOptions.position).toEqual({top: 23, left: 25});
       expect(mergedOptions.domInsertion).toEqual('parent');
     });
 
@@ -156,7 +156,6 @@ describe('BaseTooltipDirective', () => {
   });
 
 
-
   describe('Show and modify tooltips', () => {
 
     it('should trigger re-positioning of tooltip when user resizes window', () => {
@@ -165,7 +164,8 @@ describe('BaseTooltipDirective', () => {
       jest.useFakeTimers();
 
       strTooltipDirectiveInstance['tooltipComponent'] = {
-        setPosition() {}
+        setPosition() {
+        }
       } as TooltipComponent;
 
       const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
@@ -312,7 +312,7 @@ describe('BaseTooltipDirective', () => {
       const appendComponentToBodySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'appendComponentToBody');
       const setTooltipVisibilitySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'setTooltipVisibility');
       const showTooltipOnHostComponentSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'showTooltipOnHostComponent');
-      const expectedTooltipContent = {"changingThisBreaksApplicationSecurity": "<div>This is a <strong>tooltip</strong> with HTML</div>"};
+      const expectedTooltipContent = {'changingThisBreaksApplicationSecurity': '<div>This is a <strong>tooltip</strong> with HTML</div>'};
 
       /* Act */
       fixtureHtmlTooltip.detectChanges();
@@ -341,7 +341,6 @@ describe('BaseTooltipDirective', () => {
     // Create same test for tooltip-template !
 
   });
-
 
 
   describe('Hide tooltips', () => {
@@ -478,17 +477,20 @@ describe('BaseTooltipDirective', () => {
       Button with string tooltip
     </button>`
 })
-class HostWithStrTooltipComponent {}
+class HostWithStrTooltipComponent {
+}
 
 @Component({
   standalone: false,
-  template: `<button type="button" [tooltipHtml]="safeTooltipHtml">Button with Html Tooltip</button>`
+  template: `
+    <button type="button" [tooltipHtml]="safeTooltipHtml">Button with Html Tooltip</button>`
 })
 class HostWithHtmlTooltipComponent {
   tooltipHtml = '<div>This is a <strong>tooltip</strong> with HTML</div>';
   safeTooltipHtml!: SafeHtml;
 
-  constructor(private sanitizer: DomSanitizer){ }
+  constructor(private sanitizer: DomSanitizer) {
+  }
 
   ngOnInit(): void {
     this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
@@ -528,4 +530,5 @@ class HostWithHtmlTooltipComponent {
       Button with string tooltip
     </button>`
 })
-class HostWithTooltipWithOptionsComponent {}
+class HostWithTooltipWithOptionsComponent {
+}
