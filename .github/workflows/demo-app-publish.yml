@@ -49,6 +49,10 @@ jobs:
         run: npm install
         working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
 
+      - name: Run Tests
+        run: npm run test:ci
+        working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
+
       - name: Check if Deployment is Needed
         id: version_check
         run: |
