@@ -18,9 +18,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "preserveSymlinks": true,
-            "outputPath": {
-              "base": "dist/ngx-tooltip-directives-demo"
-            },
+            "outputPath": "dist/ngx-tooltip-directives-demo",
             "index": "src/index.html",
             "polyfills": [
               "zone.js"
@@ -57,8 +55,7 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,
-              "tsConfig": "tsconfig.app.dev.json"
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
@@ -74,9 +71,6 @@
             }
           },
           "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest"
         }
       }
     }

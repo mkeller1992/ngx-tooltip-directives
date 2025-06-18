@@ -4,9 +4,7 @@
   "compilerOptions": {
     "module": "CommonJS",
     "outDir": "./out-tsc/spec",
-    "types": [
-      "jest"
-    ],
+    "types": [],
     "paths": {
       "@ngx-tooltip-directives": [
         "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
