@@ -74,6 +74,17 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",          
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss"
+          }
         }
       }
     }
