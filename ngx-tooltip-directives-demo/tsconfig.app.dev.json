@@ -1,0 +1,19 @@
+/* Specific settings only applied for npm start and ng serve (but not for ng build) */
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "outDir": "./out-tsc/app",
+      "types": [],
+      "paths": {
+        "@ngx-tooltip-directives": [
+          "../ngx-tooltip-directives-lib/dist/ngx-tooltip-directives"
+        ]
+      },
+    },
+    "files": [
+      "src/main.ts",
+    ],
+    "include": [
+      "src/**/*.d.ts"
+    ]
+  }
