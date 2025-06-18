@@ -219,7 +219,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | hideDelayAfterClick   | number                                | 0 | The delay in ms before hiding the tooltip when the "click" trigger is used. |
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
 | position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
-   
+| domInsertion          | "parent" \| "body"            | 'parent' | Insert the tooltip inside parent or body element. |
 ---
 
 ## Events
