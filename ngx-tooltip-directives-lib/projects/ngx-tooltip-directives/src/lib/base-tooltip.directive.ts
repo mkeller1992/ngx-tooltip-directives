@@ -174,6 +174,11 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     this.collectedOptions.position = val;
   }
 
+  @Input()
+  set domInsertion(val: 'body' | 'parent') {
+    this.collectedOptions.domInsertion = val;
+  }
+
 
   @Output()
   events = new EventEmitter<{ type: string, position: { top: number, left: number } | DOMRect }>();
@@ -415,13 +420,19 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     // Get the host element from hostElementRef.
     const hostElem = this.hostElementRef.nativeElement;
 
-    if (hostElem) {
-      // Append the DOM element (tooltip) to the host element.
-      hostElem.appendChild(domElemTooltip);
-    } else {
+    // Get the DOM insertion option.
+    const domInsertion = this.mergedOptions.domInsertion;
+
+    // fallback if host element is not available
+    if (!hostElem) {
       console.warn('Host element not found, appending to body instead.');
-      document.body.appendChild(domElemTooltip); // fallback if host element is not available
+      document.body.appendChild(domElemTooltip);
+      return;
     }
+
+    // Append the DOM element (tooltip) to the defined container element.
+    const container = domInsertion === 'body' ? document.body : hostElem;
+    container.appendChild(domElemTooltip);
 
     // Subscribe to events from the component.
     this.tooltipComponent?.visibilityChangeCompleted$
