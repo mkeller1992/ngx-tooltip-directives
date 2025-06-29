@@ -164,7 +164,7 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
 
         strTooltipDirectiveInstance['tooltipComponent'] = {
-          setPosition() {}
+          setPosition(isFixedPosition: boolean) {}
         } as TooltipComponent;
         
         const subscribeToResizeEventsSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
@@ -274,7 +274,7 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
         
         const createTooltipSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'createTooltip');
-        const appendComponentToBodySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'appendComponentToBody');
+        const appendTooltipToDomElement = jest.spyOn(strTooltipDirectiveInstance as any, 'appendTooltipToDomElement');
         const setTooltipVisibilitySpy = jest.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
         const showTooltipOnHostComponentSpy = jest.spyOn(strTooltipDirectiveInstance as any, 'showTooltipOnHostComponent'); 
         
@@ -287,7 +287,7 @@ import { TooltipOptions } from './options.interface';
   
         /* Assert */
         expect(createTooltipSpy).toHaveBeenCalledTimes(1);
-        expect(appendComponentToBodySpy).toHaveBeenCalledTimes(1);
+        expect(appendTooltipToDomElement).toHaveBeenCalledTimes(1);
         expect(strTooltipDirectiveInstance['tooltipComponent']).toBeDefined();
         expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
         expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('visible');
@@ -308,7 +308,7 @@ import { TooltipOptions } from './options.interface';
         jest.useFakeTimers();
         
         const createTooltipSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'createTooltip');
-        const appendComponentToBodySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'appendComponentToBody');
+        const appendTooltipToDomElement = jest.spyOn(htmlTooltipDirectiveInstance as any, 'appendTooltipToDomElement');
         const setTooltipVisibilitySpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'setTooltipVisibility');
         const showTooltipOnHostComponentSpy = jest.spyOn(htmlTooltipDirectiveInstance as any, 'showTooltipOnHostComponent');
         const expectedTooltipContent = {"changingThisBreaksApplicationSecurity": "<div>This is a <strong>tooltip</strong> with HTML</div>"};
@@ -321,7 +321,7 @@ import { TooltipOptions } from './options.interface';
   
         /* Assert */
         expect(createTooltipSpy).toHaveBeenCalledTimes(1);
-        expect(appendComponentToBodySpy).toHaveBeenCalledTimes(1);
+        expect(appendTooltipToDomElement).toHaveBeenCalledTimes(1);
         expect(htmlTooltipDirectiveInstance['tooltipComponent']).toBeDefined();
         expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
         expect(setTooltipVisibilitySpy).toHaveBeenCalledWith('visible');

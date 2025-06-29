@@ -12,20 +12,20 @@ Tooltips are informative pop-up tips that appear when you hover over or click on
 
 ---
 
-## Demo
+## 🎯 Demo
 https://mkeller1992.github.io/ngx-tooltip-directives/
 
 ---
 
-## Install
+## 📦 Install
 
 To install the library, enter the following command in your console:
 ```
 npm i ngx-tooltip-directives
 ```
 
-## Setup
-### For apps based on `Standalone Components`
+## 🛠️ Setup
+### 🧱 For apps based on `Standalone Components`
 Import the directives for the respective tooltips directly in your component:
 ```ts
 import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from '@ngx-tooltip-directives';
@@ -39,7 +39,7 @@ import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } f
 ```
 
 
-### For apps based on `ngModule`
+### 🧱 For apps based on `ngModule`
 Make sure you import `NgxTooltipDirectivesModule` into your `@NgModule`:
 ```ts
 import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
@@ -49,16 +49,16 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
 }) 
 ```
 
-## Usage
+## 🚀 Usage
 There are three ways of creating a tooltip:
     
-### Pass the tooltip text as a string via `tooltipStr`:
+### 💬 Pass the tooltip text as a string via `tooltipStr`:
 
 ```html
 <div tooltipStr="Tooltip text">Show Tooltip</div>
 ```
 
-### Pass the tooltip content as SafeHtml via `tooltipHtml`:
+### 🧩 Pass the tooltip content as SafeHtml via `tooltipHtml`:
 
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
@@ -77,7 +77,7 @@ export class AppComponent {
 }
 ```
 
-### Pass the tooltip content as template via `tooltipTemplate`:
+### 🧪 Pass the tooltip content as template via `tooltipTemplate`:
 
 ```html
 <ng-template #myTemplate>
@@ -111,7 +111,7 @@ context = { estimate: 10 };
 
 ---
 
-## Trigger tooltip programmatically
+## 🧑‍💻 Trigger tooltip programmatically
 ```html
 <div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
 
@@ -133,7 +133,7 @@ hide() {
 
 ---
 
-## 3 ways of setting tooltip options
+## ⚙️ 3 ways of setting tooltip options
 
 1 - Options can be set via html-attributes, so they have the highest priority:
 
@@ -188,10 +188,22 @@ const myDefaultTooltipOptions: TooltipOptions = {
     ]
 })
 ```
+---
+
+### ⚙️ `appendTooltipToBody` – controlling where the tooltip is attached
+
+By default, tooltips are appended to the `<body>` to ensure correct positioning regardless of scrollable containers or layout restrictions.  
+If you want to append the tooltip to the element itself (e.g. for Shadow DOM, strict layouts, or component-scoped tooltips), set:
+
+```html
+<div tooltipStr="Tooltip" [options]="{ appendTooltipToBody: false }">
+  Tooltip with parent-based positioning
+</div>
+```
 
 ---
 
-## Properties
+## 🧾 Properties
 
 | name                  | type                                  | default | description |
 |-----------------------|---------------------------------------|---------|-------------|
@@ -219,10 +231,11 @@ const myDefaultTooltipOptions: TooltipOptions = {
 | hideDelayAfterClick   | number                                | 0 | The delay in ms before hiding the tooltip when the "click" trigger is used. |
 | pointerEvents         | "auto" \| "none"                      | 'auto'  | Defines whether or not the tooltip reacts to pointer events. |
 | position              | {top: number, left: number}           | undefined | The coordinates of the tooltip relative to the browser window. |  
-   
+| appendTooltipToBody   | boolean                               | true    | If `true`, the tooltip is appended to the `<body>` (default). If `false`, it is appended to the parent element. |
+
 ---
 
-## Events
+## 📡 Events
 
 Events are called in accordance with the delays specified in the options within the directive. By default, there is a no delay before the tooltip hides.
 
@@ -235,7 +248,7 @@ Events are called in accordance with the delays specified in the options within 
 
 ---
 
-## Methods
+## 🤖 Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.
 
@@ -246,7 +259,7 @@ If you have defined the directive options, these will be taken into consideratio
 
 ---
 
-## Testing with NgxTooltipDirectives
+## 🧪 Testing with NgxTooltipDirectives
 
 To simplify unit testing of components that use `NgxTooltipDirectives`, this library provides a set of mock directives as well as a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing on the component logic instead.
 
