@@ -1,6 +1,6 @@
 
 
-import { importProvidersFrom } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { APP_ROUTES } from './app/app.routes';
@@ -11,9 +11,9 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 bootstrapApplication(AppComponent,
   {
     providers: [
-      importProvidersFrom(),
       provideRouter(APP_ROUTES, withComponentInputBinding()),
-      provideAnimations(),  
+      provideAnimations(),
+      provideZonelessChangeDetection(),
     ]
   })
   .catch(err => console.error(err));
