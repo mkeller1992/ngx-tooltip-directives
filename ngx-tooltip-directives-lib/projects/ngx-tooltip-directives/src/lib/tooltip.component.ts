@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostBinding, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, inject, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 import { ContentType } from './base-tooltip.directive';
@@ -27,6 +27,9 @@ interface TooltipStyles {
 
 
 export class TooltipComponent implements OnInit, OnDestroy {
+	private readonly cdRef = inject(ChangeDetectorRef);
+	private readonly elementRef = inject(ElementRef);
+	private readonly renderer = inject(Renderer2);
 
 	// The observable below will inform base-tooltip-directive when user clicked outside tooltip:
 	private userClickOutsideTooltipSubject = new Subject<MouseEvent>();
@@ -75,9 +78,6 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	hostElementPosition!: { top: number, left: number } | DOMRect;
 	tooltipOffset!: number;
 
-	constructor(private elementRef: ElementRef,
-                private renderer: Renderer2) {}
-
 	ngOnInit() {
 		this.listenToClicksOutsideTooltip();
     	this.listenToFadeInEnd();
@@ -90,17 +90,21 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	showTooltip(config: TooltipDto) {
 		this.setTooltipProperties(config);
 		this.tooltipState = 'show';
+		this.cdRef.markForCheck(); // To comply with zoneless change detection
 
-    	// 'setTimeout()' prevents the tooltip from 'jumping around'
-		setTimeout(() => {
-			const appendTooltipToBody = config.options.appendTooltipToBody ?? defaultOptions.appendTooltipToBody!;
-			const isFixedPosition = !appendTooltipToBody;
-			this.setPosition(isFixedPosition);
-    	});
+
+		// 'setTimeout()' prevents the tooltip from 'jumping around'
+		requestAnimationFrame(() => {
+			const appendToBody = config.options.appendTooltipToBody ?? defaultOptions.appendTooltipToBody!;
+			const isFixed = !appendToBody;
+			this.setPosition(isFixed);
+			this.cdRef.markForCheck(); // To comply with zoneless change detection
+		});
 	}
 
 	hideTooltip() {
 		this.tooltipState = 'hide';
+		this.cdRef.markForCheck(); // To comply with zoneless change detection
 	}
 
 	setPosition(isFixedPosition: boolean): void {
@@ -121,6 +125,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 
 		this.removeAllPlacementClasses();
 		this.setPlacementStyles(placementStyles);
+		this.cdRef.markForCheck(); // To comply with zoneless change detection
 	}
 
 
@@ -146,7 +151,10 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 				filter(event => event.propertyName === 'opacity' && this.tooltipState === 'show'),
-				tap(() => this.visibilityChangeCompletedSubject.next({ type: 'shown' })),
+				tap(() => { 
+						this.visibilityChangeCompletedSubject.next({ type: 'shown' })
+						this.cdRef.markForCheck(); // To comply with zoneless change detection
+					}),
 				takeUntil(this.destroy$),
 		  )
 		  .subscribe();
@@ -156,7 +164,10 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
 				filter(event => event.propertyName === 'opacity' && this.tooltipState === 'hide'),
-				tap(() => this.visibilityChangeCompletedSubject.next({ type: 'hidden' })),
+				tap(() => { 
+					this.visibilityChangeCompletedSubject.next({ type: 'hidden' })
+					this.cdRef.markForCheck(); // To comply with zoneless change detection
+				}),
 				takeUntil(this.destroy$)
 		  )
 		  .subscribe();

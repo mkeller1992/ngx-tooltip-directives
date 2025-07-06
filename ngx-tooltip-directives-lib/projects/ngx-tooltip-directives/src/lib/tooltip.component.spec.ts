@@ -1,19 +1,19 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { TooltipComponent } from './tooltip.component';
-import { Renderer2, ElementRef } from '@angular/core';
+import { Renderer2, ElementRef, provideZonelessChangeDetection } from '@angular/core';
 import { TooltipDto } from './tooltip.dto';
 import { defaultOptions } from './default-options.const';
 
-// Mock ElementRef
+// Mock ElementRef for component instantiation
 const mockElementRef = {
   nativeElement: document.createElement('div')
 };
 
+// Optional DOMRect mock (only needed if component logic depends on instanceof DOMRect)
 export class DOMRect {
-  constructor(private x: number, private y: number, private width: number, private height: number) {
-  }
-  // Add other properties and methods as needed for your tests
-};
+  constructor(private x: number, private y: number, private width: number, private height: number) {}
+  // Extend as needed for tests
+}
 
 describe('TooltipComponent', () => {
   let component: TooltipComponent;
@@ -24,6 +24,7 @@ describe('TooltipComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TooltipComponent],
       providers: [
+        provideZonelessChangeDetection(),
         Renderer2,
         { provide: ElementRef, useValue: mockElementRef },
       ]
@@ -36,7 +37,7 @@ describe('TooltipComponent', () => {
   });
 
   afterEach(() => {
-    // Reset Jest's timers to the real implementations after each test
+    // Reset Jest timers to real implementations after each test
     jest.useRealTimers();
   });
 
@@ -53,24 +54,25 @@ describe('TooltipComponent', () => {
       hostElement: document.createElement('div'),
       hostElementPosition: { top: 5, left: 5 },
       options: { ...defaultOptions , placement: 'left' }
-    }
+    };
 
     component.showTooltip(tooltipDto);
+    jest.advanceTimersByTime(16); // Simulate requestAnimationFrame
     fixture.detectChanges();
-    jest.advanceTimersByTime(1);
 
     expect(component.tooltipState).toBe('show');
     expect(component.currentContentType).toBe('string');
     expect(component.originalPlacement).toBe('left');
     expect(component.tooltipStr).toBe(tooltipText);
 
-    // Check also tooltip-element in html:
+    // Check if tooltip content is correctly rendered in the DOM
     const tooltipLabel = (fixture.nativeElement.querySelector('.tooltip-label') as HTMLDivElement).textContent;
     expect(tooltipLabel?.trim()).toBe(tooltipText);
   });
 
   it('should set tooltipState to "hide" when hideTooltip is called', () => {
     component.hideTooltip();
+    fixture.detectChanges();
     expect(component.tooltipState).toBe('hide');
   });
 
@@ -88,22 +90,14 @@ describe('TooltipComponent', () => {
     };
 
     component.showTooltip(tooltipDto);
+    jest.advanceTimersByTime(16); // Simulate requestAnimationFrame
     fixture.detectChanges();
-    jest.advanceTimersByTime(1);
 
     expect(setPlacementStylesSpy).toHaveBeenCalledTimes(1);
     expect(component.hostStyleTop).toBe('55px');
     expect(component.hostStyleLeft).toBe('41px');
 
-
-    
-    // TODO !!!!
-
-    // Add more assertions !
-
-
+    // TODO: Add more DOM and style assertions as needed
 
   });
-
 });
-
