@@ -109,12 +109,12 @@ export class TooltipComponent implements OnInit, OnDestroy {
 
 	setPosition(isFixedPosition: boolean): void {
 		let placementStyles = this.calculateTooltipStylesForPlacement(this.originalPlacement, isFixedPosition);
-		const isInsideVisibleArea = this.isPlacementInsideVisibleArea(placementStyles);
+		const isInsideVisibleArea = this.isPlacementInsideVisibleArea(placementStyles, isFixedPosition);
 
 		if (!isInsideVisibleArea && this.autoPlacement) {
 			for (const placement of this.prioritizedPlacements) {
 				const styles = this.calculateTooltipStylesForPlacement(placement, isFixedPosition);
-				const isVisible = this.isPlacementInsideVisibleArea(styles);
+				const isVisible = this.isPlacementInsideVisibleArea(styles, isFixedPosition);
 
 				if(isVisible) {
 					placementStyles = styles;
@@ -285,11 +285,18 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private isPlacementInsideVisibleArea(styleData: TooltipStyles): boolean {
-		const topEdge = styleData.topStyle;
-		const bottomEdge = styleData.topStyle + styleData.tooltipHeight;
+	private isPlacementInsideVisibleArea(styleData: TooltipStyles, isFixedPosition: boolean): boolean {
+		const topEdge = isFixedPosition
+			? styleData.topStyle
+			: styleData.topStyle - styleData.adjustScrollY;
+
+		const bottomEdge = isFixedPosition
+			? styleData.topStyle + styleData.tooltipHeight
+			: styleData.topStyle + styleData.tooltipHeight - styleData.adjustScrollY;
+
 		const leftEdge = styleData.leftStyle;
 		const rightEdge = styleData.leftStyle + styleData.tooltipWidth;
+
 		const bodyHeight = window.innerHeight;
 		const bodyWidth = styleData.clientWidth;
 
