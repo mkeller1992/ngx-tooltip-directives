@@ -1,4 +1,4 @@
-import { ApplicationRef, ComponentRef, Directive, ElementRef, EventEmitter, Inject, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ApplicationRef, ComponentRef, Directive, ElementRef, EventEmitter, inject, Inject, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { auditTime, filter, first, fromEvent, merge, race, Subject, switchMap, takeUntil, tap, timer } from 'rxjs';
 import { defaultOptions } from './default-options.const';
@@ -13,6 +13,11 @@ export type ContentType = "string" | "html" | "template";
 @Directive()
 
 export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestroy {
+	private readonly hostElementRef = inject(ElementRef<HTMLElement>);
+	private readonly viewContainerRef = inject(ViewContainerRef);
+	private readonly appRef = inject(ApplicationRef);
+	private readonly injector = inject(Injector);
+	
 
 	// Will be populated by child-directive
 	private _tooltipContent!: string | SafeHtml | TemplateRef<any>;
@@ -206,13 +211,9 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     private unsubscribeInputListeners$ = new Subject<void>();
     private destroy$ = new Subject<void>();
 
-    constructor(
-        @Optional() @Inject(TooltipOptionsService) private initOptions: TooltipOptions,
-        private hostElementRef: ElementRef,
-        private viewContainerRef: ViewContainerRef,
-        private appRef: ApplicationRef,
-        private injector: Injector) {}
 
+    constructor(
+        @Optional() @Inject(TooltipOptionsService) private initOptions: TooltipOptions) {}
 
     ngOnInit(): void {
     	// Map tooltip options:
