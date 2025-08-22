@@ -46,7 +46,7 @@ jobs:
           (cd ./${{ env.DEMO_APP_FOLDER_NAME }} && npm link ${{ env.LIB_NAME }})
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./${{ env.DEMO_APP_FOLDER_NAME }}
 
       - name: Run Tests
