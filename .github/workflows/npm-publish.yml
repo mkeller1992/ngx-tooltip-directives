@@ -28,13 +28,16 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
 
       # Install dependencies at the root level
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
         working-directory: ${{ env.BASE_DIR }}
+        env:
+          NX_NATIVE: 'false'
+          NX_DAEMON: 'false'
 
       # Run tests at the root level
       - name: Run Tests
