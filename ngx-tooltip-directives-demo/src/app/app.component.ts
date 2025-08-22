@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from '@ngx-tooltip-directives';
 import { AngularDraggableModule } from 'angular2-draggable';
@@ -12,6 +12,7 @@ import packageJson from '../../package.json';
 })
 
 export class AppComponent implements OnInit {
+  private sanitizer = inject(DomSanitizer);
 
   @ViewChild('tooltipProgrammatically')
   tooltipProgrammatically!: TooltipStrDirective;
@@ -23,8 +24,7 @@ export class AppComponent implements OnInit {
   safeTooltipHtml!: SafeHtml;
 
   context = { estimate: 10 };
-
-  constructor(private sanitizer: DomSanitizer){ }
+  
 
   ngOnInit(): void {
     console.log(`Frontend Version: v${packageJson?.version}`);
