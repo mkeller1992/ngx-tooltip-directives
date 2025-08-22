@@ -15,9 +15,8 @@ export type ContentType = "string" | "html" | "template";
 export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestroy {
 	private readonly hostElementRef = inject(ElementRef<HTMLElement>);
 	private readonly viewContainerRef = inject(ViewContainerRef);
-	private readonly appRef = inject(ApplicationRef);
 	private readonly injector = inject(Injector);
-	
+
 
 	// Will be populated by child-directive
 	private _tooltipContent!: string | SafeHtml | TemplateRef<any>;
@@ -491,8 +490,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     			this.events.emit({ type: 'hide', position: this.hostElementPosition });
     		}
 
-    		this.appRef.detachView(this.refToTooltipComponent.hostView);
-    		this.refToTooltipComponent.destroy();
+    		this.refToTooltipComponent?.destroy();
 
     		if (tooltipVisibleAtStart) {
     			this.events.emit({ type: 'hidden', position: this.hostElementPosition })

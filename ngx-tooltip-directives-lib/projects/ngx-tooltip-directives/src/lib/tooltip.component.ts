@@ -63,7 +63,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	private _hostStyleMinWidth = signal<string | null>(null);
 	private _hostStyleMaxWidth = signal<string>(defaultOptions.maxWidth!);
 	private _hostStylePointerEvents = signal<string>(defaultOptions.pointerEvents!);
-	private _transitionTime = signal<string>(defaultOptions.animationDurationDefault! + 'ms');
+	private _transitionTime = signal<string>(`${defaultOptions.animationDurationDefault}ms`);
 	private _textColor = signal<string>(defaultOptions.textColor!);
 	private _textAlign = signal<string>(defaultOptions.textAlign!);
 	private _backgroundColor = signal<string>(defaultOptions.backgroundColor!);
@@ -154,7 +154,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		this.setTooltipProperties(config);
 		this._state.set('show');
 
-		// 'setTimeout()' prevents the tooltip from 'jumping around'
+		// 'requestAnimationFrame()' prevents the tooltip from 'jumping around'
 		requestAnimationFrame(() => {
 			const appendToBody = config.options.appendTooltipToBody ?? defaultOptions.appendTooltipToBody!;
 			const isFixed = !appendToBody;
@@ -354,45 +354,27 @@ export class TooltipComponent implements OnInit, OnDestroy {
 
 
 	private applyStyleOptions(options: TooltipOptions) {
-		if (options.tooltipClass) {
-			this._customClass.set(options.tooltipClass);
-		}
-		if (options.zIndex && options.zIndex > 0) {
-			this._hostStyleZIndex.set(options.zIndex);
-		}
-		if (options.pointerEvents) {
-			this._hostStylePointerEvents.set(options.pointerEvents);
-		}
-		if (options.animationDuration !== undefined && options.animationDuration !== null) {
-			this._transitionTime.set(`${options.animationDuration }ms`);
-		}
-		if (options.textColor) {
-			this._textColor.set(options.textColor)
-		}
-		if (options.textAlign) {
-			this._textAlign.set(options.textAlign);
-		}
-		if (options.padding) {
-			this._hostStylePadding.set(options.padding);
-		}
-		if (options.backgroundColor) {
-			this._backgroundColor.set(options.backgroundColor);
-		}
-		if (options.borderColor) {
-			this._borderColor.set(options.borderColor);
-		}		
-		if (options.shadow !== undefined && options.shadow !== null) {
-			this._hasShadow.set(options.shadow);
-		}		
-		if (options.minWidth) {
-			this._hostStyleMinWidth.set(options.minWidth);
-		}
-		if (options.maxWidth) {
-			this._hostStyleMaxWidth.set(options.maxWidth);
-		}
-		if (options.width) {
-			this._hostStyleWidth.set(options.width);
-		}
+		this._customClass.set(options.tooltipClass ?? '');
+
+		const zIndex = typeof options.zIndex === 'number' ? options.zIndex : (defaultOptions.zIndex ?? 0);
+		this._hostStyleZIndex.set(zIndex);
+
+		this._hostStylePointerEvents.set(options.pointerEvents ?? defaultOptions.pointerEvents!);
+
+		const durationMs = (options.animationDuration ?? defaultOptions.animationDurationDefault) + 'ms';
+		this._transitionTime.set(durationMs);
+
+		this._textColor.set(options.textColor ?? defaultOptions.textColor!);
+		this._textAlign.set(options.textAlign ?? defaultOptions.textAlign!);
+		this._hostStylePadding.set(options.padding ?? defaultOptions.padding!);
+		this._backgroundColor.set(options.backgroundColor ?? defaultOptions.backgroundColor!);
+		this._borderColor.set(options.borderColor ?? defaultOptions.borderColor!);
+
+		this._hasShadow.set(options.shadow ?? defaultOptions.shadow!);
+
+		this._hostStyleMinWidth.set(options.minWidth ?? null);
+		this._hostStyleMaxWidth.set(options.maxWidth ?? defaultOptions.maxWidth!);
+		this._hostStyleWidth.set(options.width ?? null);
 	}
 
 	ngOnDestroy(): void {
