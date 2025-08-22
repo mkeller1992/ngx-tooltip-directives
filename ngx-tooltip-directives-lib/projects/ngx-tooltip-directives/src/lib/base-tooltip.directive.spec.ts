@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By, DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BaseTooltipDirective } from './base-tooltip.directive';
@@ -29,7 +29,8 @@ import { TooltipOptions } from './options.interface';
         imports: [
           TooltipStrDirective,
           TooltipHtmlDirective
-        ]
+        ],
+        providers: [provideZonelessChangeDetection()],
       })
       .compileComponents();
   

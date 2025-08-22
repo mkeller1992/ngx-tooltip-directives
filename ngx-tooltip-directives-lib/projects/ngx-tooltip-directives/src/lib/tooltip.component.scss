@@ -1,13 +1,13 @@
 
 :host {
   transform: scale(0.0);
-  text-align: center;
+  text-align: center; // fallback, will be overwritten by HostBinding from TS
   border-radius: 6px;
   position: absolute; // fallback, will be overwritten by HostBinding from TS
-  pointer-events: none;
-  z-index: 1100;
-  top: 0;
-  left: 0;
+  pointer-events: auto; // fallback, will be overwritten by HostBinding from TS
+  z-index: 1100; // fallback, will be overwritten by HostBinding from TS
+  top: 0; // fallback, will be overwritten by HostBinding from TS
+  left: 0; // fallback, will be overwritten by HostBinding from TS
 
   .tooltip-label {
     text-align: var(--tooltip-text-align);

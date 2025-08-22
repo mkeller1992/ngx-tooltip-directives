@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, provideZonelessChangeDetection } from "@angular/core";
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from "@angular/platform-browser";
 import { TooltipStrDirective } from './tooltip-str.directive';
@@ -18,7 +18,8 @@ describe('TooltipStrDirective', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [HostComponent],
-            imports: [TooltipStrDirective]
+            imports: [TooltipStrDirective],
+            providers: [provideZonelessChangeDetection()],
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostComponent);

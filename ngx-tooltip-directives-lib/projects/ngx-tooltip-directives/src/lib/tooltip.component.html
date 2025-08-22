@@ -1,20 +1,20 @@
 
 <div class="tooltip-arrow"></div>
 
-@switch (currentContentType) {
+@switch (contentType()) {
     @case ('string') {
 		<div class="tooltip-label">
-			{{ tooltipStr }}
+			{{ tooltipStr() }}
 		</div>
     }
     @case ('html') {
 		<div class="tooltip-label"
-			[innerHTML]="tooltipHtml">
+			[innerHTML]="tooltipHtml()">
 		</div>
     }
 	@case ('template') {
 		<div>
-			<ng-container *ngTemplateOutlet="tooltipTemplate; context: this.tooltipContext"></ng-container>
+			<ng-container *ngTemplateOutlet="tooltipTemplate; context: this.tooltipContext()"></ng-container>
 		</div>
     }
 }

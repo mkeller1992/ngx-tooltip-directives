@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, inject, OnDestroy, OnInit, Renderer2, TemplateRef } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, computed, ElementRef, HostBinding, inject, OnDestroy, OnInit, signal, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 import { ContentType } from './base-tooltip.directive';
@@ -22,14 +22,12 @@ interface TooltipStyles {
 	selector: 'tooltip',
 	templateUrl: './tooltip.component.html',
 	styleUrls: ['./tooltip.component.scss'],
-	imports: [CommonModule]
+	imports: [NgTemplateOutlet]
 })
 
 
 export class TooltipComponent implements OnInit, OnDestroy {
-	private readonly cdRef = inject(ChangeDetectorRef);
 	private readonly elementRef = inject(ElementRef);
-	private readonly renderer = inject(Renderer2);
 
 	// The observable below will inform base-tooltip-directive when user clicked outside tooltip:
 	private userClickOutsideTooltipSubject = new Subject<MouseEvent>();
@@ -39,44 +37,109 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	private visibilityChangeCompletedSubject = new Subject<{ type: string }>();
 	visibilityChangeCompleted$ = this.visibilityChangeCompletedSubject.asObservable();
 
-	destroy$ = new Subject<void>();
+	// --- Tooltip Content ---
+	protected contentType         = signal<ContentType>(defaultOptions.contentType!); // default to 'string'
+	protected tooltipStr          = signal<string>('');
+	protected tooltipHtml         = signal<SafeHtml | null>(null);
+	protected tooltipTemplate!: TemplateRef<any>;
+	protected tooltipContext 	  = signal<any | null>(null);
+	
+	private readonly prioritizedPlacements: Placement[] = [ 'bottom', 'right', 'top', 'left', 'bottom-left', 'top-left' ];
+
+	private autoPlacement!: boolean;
+	private hostElement!: any;
+	public hostElementPosition!: { top: number, left: number } | DOMRect;
+	private tooltipOffset!: number;
+
+	// --- State as signals ---	
+
+	// Initialize all host styles
+	public hostPosition = signal<string>('absolute');
+	private _hostStyleTop = signal<number>(0);
+	private _hostStyleLeft = signal<number>(0);
+	private _hostStylePadding = signal<string>(defaultOptions.padding!);
+	private _hostStyleZIndex = signal<number>(defaultOptions.zIndex!);
+	private _hostStyleWidth = signal<string | null>(null);
+	private _hostStyleMinWidth = signal<string | null>(null);
+	private _hostStyleMaxWidth = signal<string>(defaultOptions.maxWidth!);
+	private _hostStylePointerEvents = signal<string>(defaultOptions.pointerEvents!);
+	private _transitionTime = signal<string>(defaultOptions.animationDurationDefault! + 'ms');
+	private _textColor = signal<string>(defaultOptions.textColor!);
+	private _textAlign = signal<string>(defaultOptions.textAlign!);
+	private _backgroundColor = signal<string>(defaultOptions.backgroundColor!);
+	private _borderColor = signal<string>(defaultOptions.borderColor!);
+
+	// Initialize all host classes
+	private _state      = signal<'show'|'hide'>('hide');
+	private _placement  = signal<Placement>(defaultOptions.placement!); // placement defined by user
+  	private _placementClass = computed(() => `tooltip-${this._placement()}`);
+	private _hasShadow = signal<boolean>(defaultOptions.shadow!);
+	private _shadowClass = computed(() => this._hasShadow() ? 'tooltip-shadow' : '');
+	private _customClass = signal<string>('');
+
+  	private _classList = computed(() => {
+		const parts = [
+			'tooltip',               // static base class
+			this._state(),           // 'show' | 'hide'
+			this._placementClass(),  // e.g. 'tooltip-bottom'
+			this._shadowClass(),	 // 'tooltip-shadow' | ''
+			this._customClass().trim()
+		];
+		return parts.filter(Boolean).join(' ');
+	});
+
+  	// --- Host-classes reading the signals ---
 
 	@HostBinding('class')
-    tooltipState: string = 'hide'; // Control the state of tooltip
+	get hostClasses() { return this._classList(); }
+
+	// --- Host-styles reading the signals ---
+
+	@HostBinding('style.position') // Set 'absolute' or 'fixed' based on whether tooltip is appended to body or not
+	get hostStylePosition() { return this.hostPosition(); }
+
+    @HostBinding('style.top')
+	get hostStyleTop() { return `${this._hostStyleTop()}px`; }
+
+    @HostBinding('style.left')
+	get hostStyleLeft() { return `${this._hostStyleLeft()}px`; }
+
+	@HostBinding('style.padding')
+	get hostStylePadding() { return this._hostStylePadding(); }
+
+    @HostBinding('style.z-index')
+	get hostStyleZIndex() { return this._hostStyleZIndex(); }
+
+    @HostBinding('style.width')
+	get hostStyleWidth() { return this._hostStyleWidth(); }
+
+	@HostBinding('style.min-width')
+	get hostStyleMinWidth() { return this._hostStyleMinWidth(); }
+
+    @HostBinding('style.max-width')
+	get hostStyleMaxWidth() { return this._hostStyleMaxWidth(); }
+
+    @HostBinding('style.pointer-events')
+	get hostStylePointerEvents() { return this._hostStylePointerEvents(); }
 
 	@HostBinding('style.--transition-time')
-    transitionTime!: string;
+    get transitionTime() { return this._transitionTime(); }
 
-	@HostBinding('class.tooltip') tooltipClass = true;
-	@HostBinding('style.position') hostStylePosition!: string; // Set position based on whether tooltip is appended to body or not
-    @HostBinding('style.top') hostStyleTop!: string;
-    @HostBinding('style.left') hostStyleLeft!: string;
-	@HostBinding('style.padding') hostStylePadding!: string;
-    @HostBinding('style.z-index') hostStyleZIndex!: number;
-    @HostBinding('style.width') hostStyleWidth!: string;
-	@HostBinding('style.min-width') hostStyleMinWidth!: string;
-    @HostBinding('style.max-width') hostStyleMaxWidth!: string;
-    @HostBinding('style.pointer-events') hostStylePointerEvents!: string;
-    @HostBinding('class.tooltip-shadow') hostClassShadow!: boolean;
+	@HostBinding('style.--tooltip-text-color')
+	get textColor() { return this._textColor(); }
 
-	@HostBinding('style.--tooltip-text-color') textColor!: string;
-	@HostBinding('style.--tooltip-text-align') textAlign!: string;
-	@HostBinding('style.--tooltip-background-color') backgroundColor!: string;
-	@HostBinding('style.--tooltip-border-color') borderColor!: string;
+	@HostBinding('style.--tooltip-text-align')
+	get textAlign() { return this._textAlign(); }
 
-	tooltipStr!: string;
-	tooltipHtml!: SafeHtml;
-	tooltipTemplate!: TemplateRef<any>;
-	tooltipContext: any | undefined;
+	@HostBinding('style.--tooltip-background-color')
+	get backgroundColor() { return this._backgroundColor(); }
 
-	prioritizedPlacements: Placement[] = [ 'bottom', 'right', 'top', 'left', 'bottom-left', 'top-left' ];
+	@HostBinding('style.--tooltip-border-color')
+	get borderColor() { return this._borderColor(); }
 
-	currentContentType!: ContentType;
-	originalPlacement!: Placement; // placement defined by user
-	autoPlacement!: boolean;
-	hostElement!: any;
-	hostElementPosition!: { top: number, left: number } | DOMRect;
-	tooltipOffset!: number;
+
+	private readonly destroy$ = new Subject<void>();
+
 
 	ngOnInit() {
 		this.listenToClicksOutsideTooltip();
@@ -89,26 +152,22 @@ export class TooltipComponent implements OnInit, OnDestroy {
 
 	showTooltip(config: TooltipDto) {
 		this.setTooltipProperties(config);
-		this.tooltipState = 'show';
-		this.cdRef.markForCheck(); // To comply with zoneless change detection
-
+		this._state.set('show');
 
 		// 'setTimeout()' prevents the tooltip from 'jumping around'
 		requestAnimationFrame(() => {
 			const appendToBody = config.options.appendTooltipToBody ?? defaultOptions.appendTooltipToBody!;
 			const isFixed = !appendToBody;
 			this.setPosition(isFixed);
-			this.cdRef.markForCheck(); // To comply with zoneless change detection
 		});
 	}
 
 	hideTooltip() {
-		this.tooltipState = 'hide';
-		this.cdRef.markForCheck(); // To comply with zoneless change detection
+		this._state.set('hide');
 	}
 
 	setPosition(isFixedPosition: boolean): void {
-		let placementStyles = this.calculateTooltipStylesForPlacement(this.originalPlacement, isFixedPosition);
+		let placementStyles = this.calculateTooltipStylesForPlacement(this._placement(), isFixedPosition);
 		const isInsideVisibleArea = this.isPlacementInsideVisibleArea(placementStyles, isFixedPosition);
 
 		if (!isInsideVisibleArea && this.autoPlacement) {
@@ -123,9 +182,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		this.removeAllPlacementClasses();
 		this.setPlacementStyles(placementStyles);
-		this.cdRef.markForCheck(); // To comply with zoneless change detection
 	}
 
 
@@ -150,10 +207,9 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	private listenToFadeInEnd() {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
-				filter(event => event.propertyName === 'opacity' && this.tooltipState === 'show'),
+				filter(event => event.propertyName === 'opacity' && this._state() === 'show'),
 				tap(() => { 
 						this.visibilityChangeCompletedSubject.next({ type: 'shown' })
-						this.cdRef.markForCheck(); // To comply with zoneless change detection
 					}),
 				takeUntil(this.destroy$),
 		  )
@@ -163,10 +219,9 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	private listenToFadeOutEnd() {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
 		  .pipe(
-				filter(event => event.propertyName === 'opacity' && this.tooltipState === 'hide'),
+				filter(event => event.propertyName === 'opacity' && this._state() === 'hide'),
 				tap(() => { 
 					this.visibilityChangeCompletedSubject.next({ type: 'hidden' })
-					this.cdRef.markForCheck(); // To comply with zoneless change detection
 				}),
 				takeUntil(this.destroy$)
 		  )
@@ -174,42 +229,36 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	}
 
 	private setTooltipProperties(config: TooltipDto) {
-		this.currentContentType = config.options.contentType ?? 'string';
+		const type = config.options.contentType ?? defaultOptions.contentType!;
+		this.contentType.set(type);
 
-		if (this.currentContentType === 'string' && config.tooltipStr) {
-			this.tooltipStr = config.tooltipStr;
+		if (type === 'string' && config.tooltipStr) {
+			this.tooltipStr.set(config.tooltipStr);
 		}
-		if (this.currentContentType === 'html' && config.tooltipHtml) {
-			this.tooltipHtml = config.tooltipHtml;
+		if (type === 'html' && config.tooltipHtml) {
+			this.tooltipHtml.set(config.tooltipHtml);
 		}
-		if (this.currentContentType === 'template' && config.tooltipTemplate) {
+		if (type === 'template' && config.tooltipTemplate) {
 			this.tooltipTemplate = config.tooltipTemplate;
-			this.tooltipContext = config.tooltipContext;
+			this.tooltipContext.set(config.tooltipContext ?? null);
 		}
 
 		this.hostElement = config.hostElement;
 		this.hostElementPosition = config.hostElementPosition;
-		this.originalPlacement = config.options.placement ?? defaultOptions.placement!;
+		this._placement.set(config.options.placement ?? defaultOptions.placement!);
 		this.autoPlacement = config.options.autoPlacement ?? defaultOptions.autoPlacement!;
 		this.tooltipOffset = !!config.options.offset ? +config.options.offset : +(defaultOptions.offset ?? 0);
 
-		this.setCustomClass(config.options);
-		this.setZIndex(config.options);
-		this.setPointerEvents(config.options);
-		this.setAnimationDuration(config.options);
-		this.setStyles(config.options);
+		this.applyStyleOptions(config.options);
 	}
 
-	private setPlacementStyles(placementStyles: TooltipStyles): void {
-    	this.hostStyleTop = `${placementStyles.topStyle}px`;
-		this.hostStyleLeft = `${placementStyles.leftStyle}px`;
-    	this.renderer.addClass(this.elementRef.nativeElement, `tooltip-${placementStyles.placement ?? ''}`);
-	}
+	private setPlacementStyles(s: TooltipStyles): void {
+		// update coordinates
+		this._hostStyleTop.set(s.topStyle);
+		this._hostStyleLeft.set(s.leftStyle);
 
-	private removeAllPlacementClasses(): void {
-    	this.prioritizedPlacements.forEach(placement => {
-    		this.renderer.removeClass(this.elementRef.nativeElement, `tooltip-${placement}`);
-    	});
+		// update placement → recomputes class list automatically
+		this._placement.set(s.placement);
 	}
 
 	private calculateTooltipStylesForPlacement(placement: Placement, isFixedPosition: boolean): TooltipStyles {
@@ -303,47 +352,46 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		return topEdge >= 0 && bottomEdge <= bodyHeight && leftEdge >= 0 && rightEdge <= bodyWidth;
 	}
 
-	private setCustomClass(options: TooltipOptions){
+
+	private applyStyleOptions(options: TooltipOptions) {
 		if (options.tooltipClass) {
-			options.tooltipClass.split(' ').forEach((className:any) => {
-				this.renderer.addClass(this.elementRef.nativeElement, className);
-			});
+			this._customClass.set(options.tooltipClass);
 		}
-	}
-
-	private setZIndex(options: TooltipOptions): void {
 		if (options.zIndex && options.zIndex > 0) {
-			this.hostStyleZIndex = options.zIndex ?? defaultOptions.zIndex ?? 0;
+			this._hostStyleZIndex.set(options.zIndex);
 		}
-	}
-
-	private setPointerEvents(options: TooltipOptions): void {
 		if (options.pointerEvents) {
-			this.hostStylePointerEvents = options.pointerEvents;
+			this._hostStylePointerEvents.set(options.pointerEvents);
 		}
-	}
-
-	private setAnimationDuration(options: TooltipOptions) {
-    	const animationDuration = !!options.animationDuration ? options.animationDuration : options.animationDurationDefault;
-    	this.transitionTime = `${animationDuration}ms`;
-	}
-
-	private setStyles(options: TooltipOptions) {
-		this.textColor = options.textColor ?? defaultOptions.textColor!;
-		this.textAlign = options.textAlign ?? defaultOptions.textAlign!;
-		this.hostStylePadding = options.padding ?? defaultOptions.padding!;
-		this.backgroundColor = options.backgroundColor ?? defaultOptions.backgroundColor!;
-		this.borderColor = options.borderColor ?? defaultOptions.borderColor!;
-		this.hostClassShadow = options.shadow ?? true;
-
+		if (options.animationDuration !== undefined && options.animationDuration !== null) {
+			this._transitionTime.set(`${options.animationDuration }ms`);
+		}
+		if (options.textColor) {
+			this._textColor.set(options.textColor)
+		}
+		if (options.textAlign) {
+			this._textAlign.set(options.textAlign);
+		}
+		if (options.padding) {
+			this._hostStylePadding.set(options.padding);
+		}
+		if (options.backgroundColor) {
+			this._backgroundColor.set(options.backgroundColor);
+		}
+		if (options.borderColor) {
+			this._borderColor.set(options.borderColor);
+		}		
+		if (options.shadow !== undefined && options.shadow !== null) {
+			this._hasShadow.set(options.shadow);
+		}		
 		if (options.minWidth) {
-			this.hostStyleMinWidth = options.minWidth;
+			this._hostStyleMinWidth.set(options.minWidth);
 		}
 		if (options.maxWidth) {
-			this.hostStyleMaxWidth = options.maxWidth;
+			this._hostStyleMaxWidth.set(options.maxWidth);
 		}
 		if (options.width) {
-			this.hostStyleWidth = options.width;
+			this._hostStyleWidth.set(options.width);
 		}
 	}
 

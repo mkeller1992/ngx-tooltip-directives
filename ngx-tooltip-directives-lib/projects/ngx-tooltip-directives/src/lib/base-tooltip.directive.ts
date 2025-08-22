@@ -292,13 +292,16 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     		raceObservables$.push(clickOnHostElement$);
     	}
 
-    	race(raceObservables$).pipe(
-    		switchMap(() => {
-    			this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
-    			return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
-    		}),
-    		takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
-    	)
+		if (raceObservables$.length === 0) { return; }
+
+    	race(raceObservables$)
+			.pipe(
+				switchMap(() => {
+					this.clearTimeouts$.next();  // Cancel any ongoing hide tooltip actions
+					return this.showTooltipAfterDelay(this.mergedOptions.showDelay ?? 0);
+				}),
+				takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
+			)
     		.subscribe();
     }
 
@@ -318,13 +321,14 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     		raceObservables$.push(clickOutsideTooltip$);
     	}
 
-    	race(raceObservables$).pipe(
-    		switchMap(() => {
-    			this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
-    			return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
-    		}),
-    		takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
-    	)
+    	race(raceObservables$)
+			.pipe(
+				switchMap(() => {
+					this.clearTimeouts$.next();  // Cancel any ongoing show tooltip actions
+					return this.hideTooltipAfterDelay(this.mergedOptions.hideDelay ?? 0);
+				}),
+				takeUntil(merge(this.unsubscribeInputListeners$, this.destroy$))
+			)
     		.subscribe();
     }
 
@@ -359,7 +363,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     	timer(this.mergedOptions.showDelay ?? 0)
     		.pipe(
     			first(),
-		  		takeUntil(this.destroy$ || this.clearTimeouts$),
+		  		takeUntil(merge(this.destroy$, this.clearTimeouts$)),
 		  		tap(() => {
     				const appendToTooltipBody = this.mergedOptions.appendTooltipToBody ?? defaultOptions.appendTooltipToBody!;
     				this.appendTooltipToDomElement(appendToTooltipBody);
@@ -396,7 +400,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     	// This way the component is automatically added to the change detection cycle of the Angular application
     	this.refToTooltipComponent = this.viewContainerRef.createComponent(TooltipComponent, { injector: this.injector });
     	this.tooltipComponent = this.refToTooltipComponent.instance;
-    	this.tooltipComponent.hostStylePosition = appendTooltipToBody ? 'absolute' : 'fixed';
+		this.tooltipComponent.hostPosition.set(appendTooltipToBody ? 'absolute' : 'fixed');
 
     	if(!this.tooltipComponent) { return; }
 
