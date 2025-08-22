@@ -1,6 +1,6 @@
 {
   "name": "ngx-tooltip-directives-demo",
-  "version": "0.20.10",
+  "version": "0.20.11",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4205",

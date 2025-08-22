@@ -5,7 +5,7 @@ import {
   TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective
 } from "@ngx-tooltip-directives";
 import { AppComponent } from "./app.component";
-import { provideZoneChangeDetection } from "@angular/core";
+import { provideZonelessChangeDetection } from "@angular/core";
 
 
 describe("AppComponent", () => {
@@ -16,7 +16,7 @@ describe("AppComponent", () => {
     await TestBed.configureTestingModule({
       imports: [ AppComponent ],
       providers: [
-        provideZoneChangeDetection(),
+        provideZonelessChangeDetection(),
         { provide: DomSanitizer, useValue: { bypassSecurityTrustHtml: () => {} } },
       ]
     })
