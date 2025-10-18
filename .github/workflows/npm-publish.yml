@@ -2,51 +2,61 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+
+# Needed for OIDC (Trusted Publishing) and for pushing tags back to the repo
+permissions:
+  id-token: write       # required for npm OIDC (Trusted Publishing)
+  contents: write       # required so github-actions[bot] may 'git push' tags
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    # Set all constants here
-    env:      
+    env:
       BASE_DIR: ./ngx-tooltip-directives-lib
       PROJECT_NAME: ngx-tooltip-directives
-      # 1.) Register TOKEN on npm-website: Access Tokens > Generate New Token > Classic Token > Automation
-      # 2.) Store it on GitHub-website: repository > Settings > Secrets and variables > New repository secret
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_FOR_TOOLTIP_LIB }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     steps:
       # Checkout the repository to the runner
-      - uses: actions/checkout@v4
-
-      # Install jq tool for JSON processing
-      - name: Install jq
-        run: sudo apt-get install jq
+      - uses: actions/checkout@v5
 
       # Setup Node.js environment
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24.x'
-          registry-url: 'https://registry.npmjs.org'
 
-      # Install dependencies at the root level
+      # Ensure a recent npm that supports Trusted Publishing + provenance
+      - name: Ensure recent npm
+        run: npm i -g npm@latest
+
+      # Safety: remove any accidental project .npmrc that could force tokens
+      - name: Remove local .npmrc if present
+        run: rm -f .npmrc && rm -f $HOME/.npmrc
+
+      # Install jq tool for JSON processing
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      # Install dependencies at the library level
       - name: Install Dependencies
         run: npm ci
         working-directory: ${{ env.BASE_DIR }}
         env:
+          npm_config_foreground_scripts: 'true'   # stabilize nx postinstall on CI
+          NX_SKIP_NATIVE_BINARY_DOWNLOAD: 'true'  # prefer JS fallback
           NX_NATIVE: 'false'
           NX_DAEMON: 'false'
 
-      # Run tests at the root level
+      # Run tests at the library level
       - name: Run Tests
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
 
-      # Report test coverage (for badge on npm-library-mainpage)
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+      # Report test coverage (for badge on npm-library main page)
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ env.CODECOV_TOKEN }}
           slug: mkeller1992/ngx-tooltip-directives
@@ -60,35 +70,33 @@ jobs:
       - name: Check if version has been updated
         id: check_version
         run: |
-          # Extract the current version from package.json
+          # Extract current and latest published version
           PACKAGE_NAME=$(jq -r '.name' package.json)
           CURRENT_VERSION=$(jq -r '.version' package.json)
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-          LATEST_PUBLISHED_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
+          # Public package: npm view works without auth
+          LATEST_PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version 2>/dev/null || echo "0.0.0")
           if [ "$CURRENT_VERSION" = "$LATEST_PUBLISHED_VERSION" ]; then
-            echo "Version $CURRENT_VERSION is already published. Skipping publish..."
             echo "execute_publish=false" >> $GITHUB_ENV
           else
-            echo "Version $CURRENT_VERSION is new. Proceeding with publish..."
             echo "execute_publish=true" >> $GITHUB_ENV
           fi
         working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
 
-      # Publish the library to npm if the version has been updated
-      - name: Publish to npm
+      # Publish to npm via OIDC (no token)
+      - name: Publish to npm via OIDC (no token)
         if: env.execute_publish == 'true'
         run: npm publish
         working-directory: ${{ env.BASE_DIR }}/dist/${{ env.PROJECT_NAME }}
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
+        # No NODE_AUTH_TOKEN here — OIDC handles auth
 
-      # Set a version-tag for the deployed commit
-      - name: Set a version-tag for the commit to the specified branch
+      # Tag commit (push tag back to this repository using the built-in GITHUB_TOKEN)
+      - name: Tag commit
         if: env.execute_publish == 'true' && success()
         run: |
-          # Set a tag of the form 'v-0.0.0-lib' on the specified branch
+          # Configure git author for the automated tag
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag v${{ env.CURRENT_VERSION }}-lib
-          git push origin v${{ env.CURRENT_VERSION }}-lib
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push origin "v${{ env.CURRENT_VERSION }}-lib"
