@@ -17,12 +17,12 @@ jobs:
       - name: Set TARGET_BRANCH variable
         run: echo "TARGET_BRANCH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.TARGET_BRANCH }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24.x'
 
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build and link ngx-tooltip-directives
         run: |
-          (cd ./${{ env.LIB_FOLDER_NAME }} && npm install && npm run build && npm link)
+          (cd ./${{ env.LIB_FOLDER_NAME }} && npm ci --foreground-scripts && npm run build && npm link)
           (cd ./${{ env.DEMO_APP_FOLDER_NAME }} && npm link ${{ env.LIB_NAME }})
 
       - name: Install Dependencies
@@ -91,7 +91,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         if: env.deploy_needed == 'true'
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           branch: gh-pages
           folder: ${{ env.DEMO_APP_FOLDER_NAME }}/dist/${{ env.DEMO_PROJECT_NAME }}/browser
