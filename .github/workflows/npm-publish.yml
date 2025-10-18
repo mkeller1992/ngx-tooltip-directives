@@ -15,7 +15,6 @@ jobs:
     env:
       BASE_DIR: ./ngx-tooltip-directives-lib
       PROJECT_NAME: ngx-tooltip-directives
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       # Checkout the repository to the runner
@@ -54,12 +53,13 @@ jobs:
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
 
-      # Report test coverage (for badge on npm-library main page)
+      # Upload coverage to Codecov (tokenless with OIDC + Codecov App)
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ env.CODECOV_TOKEN }}
-          slug: mkeller1992/ngx-tooltip-directives
+          use_oidc: true
+          files: ${{ env.BASE_DIR }}/coverage/lcov.info  # point directly to LCOV file for faster uploads
+          disable_search: true                           # skip auto-discovery to avoid noisy gcov/python warnings
 
       # Build the library from the specified subdirectory
       - name: Build Library
