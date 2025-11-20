@@ -1,4 +1,6 @@
 import { setupZonelessTestEnv } from 'jest-preset-angular/setup-env/zoneless';
+declare const global: any;
+
 
 setupZonelessTestEnv();
 

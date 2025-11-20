@@ -22,15 +22,15 @@ import { TooltipComponent } from './tooltip.component';
 
 export class NgxTooltipDirectivesModule {
   
-  static forRoot(initOptions: TooltipOptions): ModuleWithProviders<NgxTooltipDirectivesModule> {
-    return {
-        ngModule: NgxTooltipDirectivesModule,
-        providers: [
-            {
-                provide: TooltipOptionsService,
-                useValue: initOptions
-            }
-        ]
-    };
-}
+	static forRoot(initOptions: TooltipOptions): ModuleWithProviders<NgxTooltipDirectivesModule> {
+		return {
+			ngModule: NgxTooltipDirectivesModule,
+			providers: [
+				{
+					provide: TooltipOptionsService,
+					useValue: initOptions
+				}
+			]
+		};
+	}
 }

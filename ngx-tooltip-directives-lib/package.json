@@ -2,36 +2,35 @@
   "name": "ngx-tooltip-directives-lib",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "jest --no-cache --coverage",
     "test:watch": "jest --watch",
-    "test:ci": "jest --runInBand"
+    "test:ci": "jest --runInBand",
+	"reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.3.6",
-    "@angular/common": "^20.3.6",
-    "@angular/compiler": "^20.3.6",
-    "@angular/core": "^20.3.6",
-    "@angular/forms": "^20.3.6",
-    "@angular/platform-browser": "^20.3.6",
-    "@angular/platform-browser-dynamic": "^20.3.6",
-    "@angular/router": "^20.3.6",
+    "@angular/animations": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.0.0",
+    "@angular/router": "^21.0.0",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.6",
-    "@angular/cli": "~20.3.6",
-    "@angular/compiler-cli": "^20.3.6",
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "~21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
     "@nrwl/jest": "^19.8.4",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
-	"jest-environment-jsdom": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "jest-preset-angular": "15.0.3",
-    "ng-packagr": "^20.3.0",
+    "ng-packagr": "^21.0.0",
     "typescript": "5.9.3"
   }
 }
