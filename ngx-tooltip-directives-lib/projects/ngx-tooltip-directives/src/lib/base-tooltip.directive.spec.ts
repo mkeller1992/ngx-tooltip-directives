@@ -1,4 +1,4 @@
-import { Component, provideZonelessChangeDetection } from '@angular/core';
+import { Component, inject, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By, DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BaseTooltipDirective } from './base-tooltip.directive';
@@ -6,6 +6,7 @@ import { TooltipStrDirective } from './tooltip-str.directive';
 import { TooltipHtmlDirective } from './tooltip-html.directive';
 import { TooltipComponent } from './tooltip.component';
 import { TooltipOptions } from './options.interface';
+import { TooltipOptionsService } from './options.service';
 
   
   describe('BaseTooltipDirective', () => {
@@ -50,6 +51,32 @@ import { TooltipOptions } from './options.interface';
     });
 
     describe('Initialization', () => {
+
+	it('should inject options provided via ngModule and TooltipOptionsService', () => {
+		/* Arrange */
+		const customOptions: TooltipOptions = { placement: 'right', display: true };
+
+		TestBed.resetTestingModule();
+
+		TestBed.configureTestingModule({
+			declarations: [HostWithStrTooltipComponent],
+			imports: [TooltipStrDirective],
+			providers: [
+				{ provide: TooltipOptionsService, useValue: customOptions }
+			]
+		}).compileComponents();
+
+		const fixture = TestBed.createComponent(HostWithStrTooltipComponent);
+		const dir = fixture.debugElement.query(By.directive(TooltipStrDirective)).injector.get(TooltipStrDirective);
+
+		/* Act */
+		fixture.detectChanges();
+
+		/* Assert */
+		const merged = (dir as any)['mergedOptions'];
+		expect(merged.placement).toBe('right');
+		expect(merged.display).toBe(true);
+		});
 
       it('should call setTooltipContent with correct arguments when tooltipStr is set', () => {
 
@@ -468,32 +495,31 @@ import { TooltipOptions } from './options.interface';
 
   });
 
-  /* Mock Components */
+	/* Mock Components */
 
-  @Component({
-    standalone: false,
-    template: `
-      <button type="button"
-        [tooltipStr]="'Tooltip String Text'">
-          Button with string tooltip
-      </button>`
-  })
-  class HostWithStrTooltipComponent {}
+	@Component({
+		standalone: false,
+		template: `
+		<button type="button"
+			[tooltipStr]="'Tooltip String Text'">
+			Button with string tooltip
+		</button>`
+	})
+	class HostWithStrTooltipComponent {}
   
-  @Component({
-    standalone: false,
-    template: `<button type="button" [tooltipHtml]="safeTooltipHtml">Button with Html Tooltip</button>`
-  })
-  class HostWithHtmlTooltipComponent {
-    tooltipHtml = '<div>This is a <strong>tooltip</strong> with HTML</div>';
-    safeTooltipHtml!: SafeHtml;
-  
-    constructor(private sanitizer: DomSanitizer){ }
-  
-    ngOnInit(): void {
-      this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
-    }
-  }
+	@Component({
+		standalone: false,
+		template: `
+			<button type="button" [tooltipHtml]="safeTooltipHtml">
+			Button with Html Tooltip
+			</button>
+		`
+	})
+	class HostWithHtmlTooltipComponent {
+		private readonly sanitizer = inject(DomSanitizer);
+		tooltipHtml = '<div>This is a <strong>tooltip</strong> with HTML</div>';
+		safeTooltipHtml: SafeHtml = this.sanitizer.bypassSecurityTrustHtml(this.tooltipHtml);
+	}
   
   @Component({
     standalone: false,

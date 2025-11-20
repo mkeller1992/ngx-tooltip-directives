@@ -17,6 +17,10 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
 	private readonly viewContainerRef = inject(ViewContainerRef);
 	private readonly injector = inject(Injector);
 
+	private readonly initOptions = inject(TooltipOptionsService, {
+		optional: true
+	});
+
 
 	// Will be populated by child-directive
 	private _tooltipContent!: string | SafeHtml | TemplateRef<any>;
@@ -209,10 +213,6 @@ export abstract class BaseTooltipDirective implements OnInit, OnChanges, OnDestr
     private clearTimeouts$ = new Subject<void>();
     private unsubscribeInputListeners$ = new Subject<void>();
     private destroy$ = new Subject<void>();
-
-
-    constructor(
-        @Optional() @Inject(TooltipOptionsService) private initOptions: TooltipOptions) {}
 
     ngOnInit(): void {
     	// Map tooltip options:
