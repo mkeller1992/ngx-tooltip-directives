@@ -7,7 +7,7 @@
     "test": "jest --no-cache --coverage",
     "test:watch": "jest --watch",
     "test:ci": "jest --runInBand",
-	"reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force",
+	"reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force"
   },
   "private": true,
   "dependencies": {
