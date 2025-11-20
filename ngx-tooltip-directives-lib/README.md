@@ -69,12 +69,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 // Code skipped for brevity
 
 export class AppComponent {
-  rawHtml: string = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
-  safeTooltipHtml: SafeHtml;
 
-  constructor(private sanitizer: DomSanitizer){ 
-    this.safeTooltipHtml = this.sanitizer.bypassSecurityTrustHtml(this.rawHtml);
-  }
+  private readonly sanitizer = inject(DomSanitizer);
+
+  rawHtml = '<div><p>This is a <strong>tooltip</strong> with HTML</p></div>';
+
+  safeTooltipHtml: SafeHtml = this.sanitizer.bypassSecurityTrustHtml(this.rawHtml);
 }
 ```
 
