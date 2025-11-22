@@ -5,7 +5,7 @@
   "homepage": "https://mkeller1992.github.io/ngx-tooltip-directives",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkeller1992/ngx-tooltip-directives"
+    "url": "git+https://github.com/mkeller1992/ngx-tooltip-directives.git"
   },
   "author": {
     "name": "Matthias Keller"

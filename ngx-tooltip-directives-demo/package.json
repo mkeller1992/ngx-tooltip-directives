@@ -9,7 +9,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:ci": "jest --runInBand",
-	"reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force",
+    "reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force",
     "deploy": "ng build --configuration=production --base-href \"/ngx-tooltip-directives/\" && node copyIndexTo404.js"
   },
   "private": true,
