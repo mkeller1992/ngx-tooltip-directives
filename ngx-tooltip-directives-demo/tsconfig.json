@@ -22,9 +22,11 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@ngx-tooltip-directives": [
-        "../ngx-tooltip-directives-lib/projects/ngx-tooltip-directives/src/public-api.ts"
-      ]
+		// This path targets public-api.ts so the demo app and its Jest tests run
+		// against the live library source without requiring a built dist/ bundle of the library:
+		"@ngx-tooltip-directives": [
+			"../ngx-tooltip-directives-lib/projects/ngx-tooltip-directives/src/public-api.ts"
+		]
     }
   },
   "angularCompilerOptions": {

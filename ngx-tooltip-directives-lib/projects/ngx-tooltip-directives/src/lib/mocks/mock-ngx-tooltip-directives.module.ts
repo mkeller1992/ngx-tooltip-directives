@@ -171,6 +171,7 @@ export class MockTooltipHtmlDirective extends MockBaseTooltipDirective {
 })
 export class MockTooltipTemplateDirective extends MockBaseTooltipDirective {
   @Input() tooltipTemplate!: any;
+  @Input() tooltipContext: any;
 }
 
 @NgModule({
