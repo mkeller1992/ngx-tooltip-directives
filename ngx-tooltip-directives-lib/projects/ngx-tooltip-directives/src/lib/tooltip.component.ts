@@ -167,22 +167,33 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	}
 
 	setPosition(isFixedPosition: boolean): void {
-		let placementStyles = this.calculateTooltipStylesForPlacement(this._placement(), isFixedPosition);
-		const isInsideVisibleArea = this.isPlacementInsideVisibleArea(placementStyles, isFixedPosition);
+		const primary = this._placement();
 
-		if (!isInsideVisibleArea && this.autoPlacement) {
-			for (const placement of this.prioritizedPlacements) {
-				const styles = this.calculateTooltipStylesForPlacement(placement, isFixedPosition);
-				const isVisible = this.isPlacementInsideVisibleArea(styles, isFixedPosition);
+		// 1) Check primary placement
+		let primaryStyles = this.calculateTooltipStylesForPlacement(primary, isFixedPosition);
+		if (!this.autoPlacement || this.isPlacementInsideVisibleArea(primaryStyles, isFixedPosition)) {
+			this.setPlacementStyles(primaryStyles);
+			return;
+		}
 
-				if(isVisible) {
-					placementStyles = styles;
-					break;
-				}
+		// 2) Auto-placement fallback
+
+		for (const placement of this.prioritizedPlacements) {
+
+			// Skip primary placement – we already checked it
+			if (placement === primary) {
+				continue;
+			}
+
+			const styles = this.calculateTooltipStylesForPlacement(placement, isFixedPosition);
+			if (this.isPlacementInsideVisibleArea(styles, isFixedPosition)) {
+				this.setPlacementStyles(styles);
+				return;
 			}
 		}
 
-		this.setPlacementStyles(placementStyles);
+		// 3) Final fallback (nothing visible) → use primary anyway
+  		this.setPlacementStyles(primaryStyles);
 	}
 
 
