@@ -258,7 +258,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		this.hostElementPosition = config.hostElementPosition;
 		this._placement.set(config.options.placement ?? defaultOptions.placement!);
 		this.autoPlacement = config.options.autoPlacement ?? defaultOptions.autoPlacement!;
-		this.tooltipOffset = !!config.options.offset ? +config.options.offset : +(defaultOptions.offset ?? 0);
+		this.tooltipOffset = !!config.options.offset ? +config.options.offset : +defaultOptions.offset!;
 
 		this.applyStyleOptions(config.options);
 	}
@@ -367,7 +367,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	private applyStyleOptions(options: TooltipOptions) {
 		this._customClass.set(options.tooltipClass ?? '');
 
-		const zIndex = typeof options.zIndex === 'number' ? options.zIndex : (defaultOptions.zIndex ?? 0);
+		const zIndex = typeof options.zIndex === 'number' ? options.zIndex : defaultOptions.zIndex!;
 		this._hostStyleZIndex.set(zIndex);
 
 		this._hostStylePointerEvents.set(options.pointerEvents ?? defaultOptions.pointerEvents!);
