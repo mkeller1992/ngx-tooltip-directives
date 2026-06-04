@@ -24,12 +24,31 @@
           },
           "defaultConfiguration": "production"
         },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "configPath": "../../jest.config.ts"
-          }
-        }
+		"test": {
+			"builder": "@angular/build:unit-test",
+			"options": {
+				"tsConfig": "tsconfig.spec.json",
+				"runnerConfig": "vitest.config.ts",
+				"providersFile": "projects/ngx-tooltip-directives/src/test-providers.ts",
+				"coverage": true,
+				"coverageInclude": [
+					"projects/ngx-tooltip-directives/src/**/*.ts"
+				],
+				"coverageExclude": [
+					"projects/ngx-tooltip-directives/src/**/*.spec.ts",
+					"projects/ngx-tooltip-directives/src/test-providers.ts",
+					"projects/ngx-tooltip-directives/src/public-api.ts",
+					"projects/ngx-tooltip-directives/src/lib/**/*.module.ts",
+					"projects/ngx-tooltip-directives/src/lib/mocks/mock-ngx-tooltip-directives.module.ts"
+				],
+				"coverageReporters": [
+					"html",
+					"text",
+					"text-summary",
+					"lcov"
+				]
+			}
+		}
       }
     }
   },

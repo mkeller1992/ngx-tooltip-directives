@@ -1,8 +1,14 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../../out-tsc/spec",
-        "types": ["jest"]
-    },
-    "include": ["**/*.spec.ts", "**/*.d.ts"]
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/spec",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts",
+	"projects/ngx-tooltip-directives/src/test-providers.ts"
+  ]
 }

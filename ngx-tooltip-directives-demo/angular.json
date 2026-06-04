@@ -73,15 +73,29 @@
           },
           "defaultConfiguration": "development"
         },
-        "test": {
-          "builder": "@nrwl/jest:jest",          
-          "options": {
-            "polyfills": [],
-			"configPath": "jest.config.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss"
-          }
-        }
+		"test": {
+			"builder": "@angular/build:unit-test",
+			"options": {
+				"tsConfig": "tsconfig.spec.json",
+				"runnerConfig": "vitest.config.ts",
+				"providersFile": "src/test-providers.ts",
+				"coverage": true,
+				"coverageInclude": [
+					"src/app/**/*.ts"
+				],
+				"coverageExclude": [
+					"src/app/**/*.spec.ts",
+					"src/app/**/*.routes.ts",
+					"src/test-providers.ts"
+				],
+				"coverageReporters": [
+					"html",
+					"text",
+					"text-summary",
+					"lcov"
+				]
+			}
+		}
       }
     }
   },

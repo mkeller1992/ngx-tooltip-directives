@@ -1,3 +1,4 @@
+import { beforeAll, beforeEach, describe, expect, it, vi, afterAll, MockInstance } from 'vitest';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { TooltipComponent } from './tooltip.component';
 import { ElementRef, provideZonelessChangeDetection } from '@angular/core';
@@ -8,17 +9,17 @@ import { defaultOptions } from './default-options.const';
 const mockElementRef = { nativeElement: document.createElement('div') };
 
 // Deterministic requestAnimationFrame
-let rafSpy: jest.SpyInstance<number, [(ts: number) => void]>;
+let rafSpy: MockInstance<typeof window.requestAnimationFrame>;
 
 function mockRequestAnimationFrame() {
-	rafSpy = jest
+	rafSpy = vi
 		.spyOn(window, 'requestAnimationFrame')
 		.mockImplementation(cb => setTimeout(() => cb(Date.now()), 0) as unknown as number);
 }
 
 function restoreRequestAnimationFrame() { rafSpy.mockRestore(); }
 
-function flushRAF() { jest.advanceTimersByTime(0); }
+function flushRAF() { vi.advanceTimersByTime(0); }
 
 describe('TooltipComponent', () => {
 	let fixture: ComponentFixture<TooltipComponent>;
@@ -27,7 +28,7 @@ describe('TooltipComponent', () => {
 
 	// Enable fake timers globally for the entire suite
 	beforeAll(() => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		mockRequestAnimationFrame();
 	});
 
@@ -269,7 +270,7 @@ describe('TooltipComponent', () => {
 	// ----------------------------------------------------------------
 
 	it('showTooltip(): triggers setPosition() inside requestAnimationFrame', () => {
-		const spy = jest.spyOn(component as any, 'setPosition');
+		const spy = vi.spyOn(component as any, 'setPosition');
 
 		component.showTooltip({
 			tooltipStr: 'x',
@@ -283,7 +284,7 @@ describe('TooltipComponent', () => {
 	});
 
 	it('showTooltip(): calls setPosition(true) when appendTooltipToBody=false', () => {
-		const spy = jest.spyOn(component as any, 'setPosition');
+		const spy = vi.spyOn(component as any, 'setPosition');
 
 		component.showTooltip({
 			tooltipStr: 'x',
@@ -302,7 +303,7 @@ describe('TooltipComponent', () => {
 	});
 
 	it('showTooltip(): uses fallback appendTooltipToBody from defaultOptions when undefined', () => {
-		const spy = jest.spyOn(component as any, 'setPosition');
+		const spy = vi.spyOn(component as any, 'setPosition');
 
 		component.showTooltip({
 			tooltipStr: 'x',
@@ -343,13 +344,13 @@ describe('TooltipComponent', () => {
 	});
 
   	it('setPosition(): switches to fallback placement when tooltip would not be visible with primary placement', () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 
 		const initialPlacement = 'bottom';
 		const expectedFallback = 'right';
 
 		// First placement check → invisible
-		const spyVisible = jest
+		const spyVisible = vi
 			.spyOn(component as any, 'isPlacementInsideVisibleArea')
 			.mockReturnValueOnce(false)
 			.mockReturnValue(true);
@@ -362,7 +363,7 @@ describe('TooltipComponent', () => {
 		});
 
 		flushRAF();
-		jest.runOnlyPendingTimers(); 
+		vi.runOnlyPendingTimers(); 
 		fixture.detectChanges();
 
 		expect(spyVisible).toHaveBeenCalledTimes(2);
@@ -376,12 +377,12 @@ describe('TooltipComponent', () => {
   	});
 
 	it('setPosition(): omits checking for fallback-placements when tooltip is visible with primary placement', () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 
 		const initialPlacement = 'bottom';
 
 		// First placement check → invisible
-		const spyVisible = jest
+		const spyVisible = vi
 			.spyOn(component as any, 'isPlacementInsideVisibleArea')
 			.mockReturnValueOnce(true)
 			.mockReturnValue(false);
@@ -394,7 +395,7 @@ describe('TooltipComponent', () => {
 		});
 
 		flushRAF();
-		jest.runOnlyPendingTimers(); 
+		vi.runOnlyPendingTimers(); 
 		fixture.detectChanges();
 
 		// Method 'isPlacementInsideVisibleArea()' must only be called once:
@@ -569,7 +570,7 @@ describe('TooltipComponent', () => {
 	it('stores template + context when contentType="template"', () => {
 		const fakeTemplateRef = {
 			elementRef: { nativeElement: null },
-			createEmbeddedView: jest.fn()
+			createEmbeddedView: vi.fn()
 		} as any;
 
 		const dto: TooltipDto = {
@@ -590,7 +591,7 @@ describe('TooltipComponent', () => {
 
 		const fakeTemplateRef = {
 			elementRef: { nativeElement: null },
-			createEmbeddedView: jest.fn()
+			createEmbeddedView: vi.fn()
 		} as any;
 
 		const dto: TooltipDto = {

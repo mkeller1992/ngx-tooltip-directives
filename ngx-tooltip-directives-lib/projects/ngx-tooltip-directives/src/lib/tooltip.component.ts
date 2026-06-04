@@ -22,7 +22,7 @@ interface TooltipStyles {
 	selector: 'tooltip',
 	templateUrl: './tooltip.component.html',
 	styleUrls: ['./tooltip.component.scss'],
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [NgTemplateOutlet]
 })
 

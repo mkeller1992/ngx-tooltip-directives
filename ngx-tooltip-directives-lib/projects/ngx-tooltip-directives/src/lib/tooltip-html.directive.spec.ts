@@ -1,57 +1,59 @@
-import { Component, provideZonelessChangeDetection } from "@angular/core";
+import { beforeEach, describe, expect, it } from 'vitest';
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By, SafeHtml } from "@angular/platform-browser";
+import { By, SafeHtml } from '@angular/platform-browser';
 import { TooltipHtmlDirective } from './tooltip-html.directive';
 
 @Component({
-    standalone: false,
-    template: `<div [tooltipHtml]="testHtml"></div>`
-  })
+	standalone: true,
+	imports: [TooltipHtmlDirective],
+	template: `<div [tooltipHtml]="testHtml"></div>`
+})
+class HostComponent {
+	testHtml: SafeHtml = '<div>Initial tooltip</div>';
+}
 
-  class HostComponent {
-    testHtml: SafeHtml = '<div>Initial tooltip</div>';
-  }
+describe('TooltipHtmlDirective', () => {
+	let fixture: ComponentFixture<HostComponent>;
+	let hostComponent: HostComponent;
 
-  describe('TooltipHtmlDirective', () => {
-    let fixture: ComponentFixture<HostComponent>;
-    let hostComponent: HostComponent;
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			imports: [HostComponent],
+			providers: [provideZonelessChangeDetection()],
+		}).compileComponents();
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [HostComponent],
-            imports: [TooltipHtmlDirective],
-            providers: [provideZonelessChangeDetection()],
-        }).compileComponents();
+		fixture = TestBed.createComponent(HostComponent);
+		hostComponent = fixture.componentInstance;
+	});
 
-        fixture = TestBed.createComponent(HostComponent);
-        hostComponent = fixture.componentInstance;
-    });
+	it('should initialize tooltip with HTML content', () => {
+		// Act
+		fixture.detectChanges();
 
-    it('should initialize tooltip with HTML content', () => {
-        // Act
-        fixture.detectChanges();
+		// Assert
+		const tooltipDirective = fixture.debugElement
+			.query(By.directive(TooltipHtmlDirective))
+			.injector
+			.get(TooltipHtmlDirective);
 
-        // Assert
-        const tooltipDirective = fixture.debugElement
-                                        .query(By.directive(TooltipHtmlDirective))
-                                        .injector
-                                        .get(TooltipHtmlDirective);
-        expect((tooltipDirective as any)._tooltipContent).toBe('<div>Initial tooltip</div>');
-    });
+		expect((tooltipDirective as any)._tooltipContent).toBe('<div>Initial tooltip</div>');
+	});
 
-    it('should override tooltip with HTML content', () => {
-        // Arrange
-        const htmlInput = '<div>Sample HTML content</div>';
-        hostComponent.testHtml = htmlInput;
+	it('should override tooltip with HTML content', () => {
+		// Arrange
+		const htmlInput = '<div>Sample HTML content</div>';
+		hostComponent.testHtml = htmlInput;
 
-        // Act
-        fixture.detectChanges();
+		// Act
+		fixture.detectChanges();
 
-        // Assert
-        const tooltipDirective = fixture.debugElement
-                                        .query(By.directive(TooltipHtmlDirective))
-                                        .injector
-                                        .get(TooltipHtmlDirective);                                       
-        expect((tooltipDirective as any)._tooltipContent).toBe(htmlInput);
-    });
+		// Assert
+		const tooltipDirective = fixture.debugElement
+			.query(By.directive(TooltipHtmlDirective))
+			.injector
+			.get(TooltipHtmlDirective);
+
+		expect((tooltipDirective as any)._tooltipContent).toBe(htmlInput);
+	});
 });

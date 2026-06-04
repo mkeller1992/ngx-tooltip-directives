@@ -1,56 +1,59 @@
-import { Component, provideZonelessChangeDetection } from "@angular/core";
+import { beforeEach, describe, expect, it } from 'vitest';
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from "@angular/platform-browser";
+import { By } from '@angular/platform-browser';
 import { TooltipStrDirective } from './tooltip-str.directive';
 
 @Component({
-    standalone: false,
-    template: `<div [tooltipStr]="testStr"></div>`
+	standalone: true,
+	imports: [TooltipStrDirective],
+	template: `<div [tooltipStr]="testStr"></div>`
 })
 class HostComponent {
-    testStr: string = 'Initial tooltip';
+	testStr: string = 'Initial tooltip';
 }
 
 describe('TooltipStrDirective', () => {
-    let fixture: ComponentFixture<HostComponent>;
-    let hostComponent: HostComponent;
+	let fixture: ComponentFixture<HostComponent>;
+	let hostComponent: HostComponent;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [HostComponent],
-            imports: [TooltipStrDirective],
-            providers: [provideZonelessChangeDetection()],
-        }).compileComponents();
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			imports: [HostComponent],
+			providers: [provideZonelessChangeDetection()],
+		}).compileComponents();
 
-        fixture = TestBed.createComponent(HostComponent);
-        hostComponent = fixture.componentInstance;
-    });
+		fixture = TestBed.createComponent(HostComponent);
+		hostComponent = fixture.componentInstance;
+	});
 
-    it('should initialize tooltip with string content', () => {
-        // Act
-        fixture.detectChanges();
+	it('should initialize tooltip with string content', () => {
+		// Act
+		fixture.detectChanges();
 
-        // Assert
-        const tooltipDirective = fixture.debugElement
-                                        .query(By.directive(TooltipStrDirective))
-                                        .injector
-                                        .get(TooltipStrDirective);
-        expect((tooltipDirective as any)._tooltipContent).toBe('Initial tooltip');
-    });
+		// Assert
+		const tooltipDirective = fixture.debugElement
+			.query(By.directive(TooltipStrDirective))
+			.injector
+			.get(TooltipStrDirective);
 
-    it('should override tooltip with string content', () => {
-        // Arrange
-        const strInput = 'Sample string content';
-        hostComponent.testStr = strInput;
+		expect((tooltipDirective as any)._tooltipContent).toBe('Initial tooltip');
+	});
 
-        // Act
-        fixture.detectChanges();
+	it('should override tooltip with string content', () => {
+		// Arrange
+		const strInput = 'Sample string content';
+		hostComponent.testStr = strInput;
 
-        // Assert
-        const tooltipDirective = fixture.debugElement
-                                        .query(By.directive(TooltipStrDirective))
-                                        .injector
-                                        .get(TooltipStrDirective);
-        expect((tooltipDirective as any)._tooltipContent).toBe(strInput);
-    });
+		// Act
+		fixture.detectChanges();
+
+		// Assert
+		const tooltipDirective = fixture.debugElement
+			.query(By.directive(TooltipStrDirective))
+			.injector
+			.get(TooltipStrDirective);
+
+		expect((tooltipDirective as any)._tooltipContent).toBe(strInput);
+	});
 });
