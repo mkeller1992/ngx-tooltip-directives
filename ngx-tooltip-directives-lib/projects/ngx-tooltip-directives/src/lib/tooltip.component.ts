@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ElementRef, HostBinding, inject, OnDestroy, OnInit, signal, TemplateRef } from '@angular/core';
+import { Component, computed, ElementRef, HostBinding, inject, OnDestroy, OnInit, signal, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 import { ContentType } from './base-tooltip.directive';
@@ -22,6 +22,7 @@ interface TooltipStyles {
 	selector: 'tooltip',
 	templateUrl: './tooltip.component.html',
 	styleUrls: ['./tooltip.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [NgTemplateOutlet]
 })
 
