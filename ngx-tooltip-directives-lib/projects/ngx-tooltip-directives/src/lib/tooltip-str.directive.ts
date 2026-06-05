@@ -1,15 +1,19 @@
-import { Directive, Input } from "@angular/core";
-import { BaseTooltipDirective } from "./base-tooltip.directive";
+import { Directive, effect, input } from '@angular/core';
+import { BaseTooltipDirective } from './base-tooltip.directive';
 
 @Directive({
-    selector: '[tooltipStr]',
-    exportAs: 'tooltipStr',
+	selector: '[tooltipStr]',
+	exportAs: 'tooltipStr',
 })
-
 export class TooltipStrDirective extends BaseTooltipDirective {
-    
-    @Input()
-    set tooltipStr(value: string) {
-        super.setTooltipContent(value, 'string');
-    }
+
+	readonly tooltipStr = input.required<string>();
+
+	constructor() {
+		super();
+
+		effect(() => {
+			super.setTooltipContent(this.tooltipStr(), 'string');
+		});
+	}
 }

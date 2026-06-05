@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ElementRef, HostBinding, inject, OnDestroy, OnInit, signal, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
 import { ContentType } from './base-tooltip.directive';
@@ -23,7 +23,29 @@ interface TooltipStyles {
 	templateUrl: './tooltip.component.html',
 	styleUrls: ['./tooltip.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [NgTemplateOutlet]
+	imports: [NgTemplateOutlet],
+	host: {
+		// --- Host-classes reading the signals ---
+
+		'[class]': '_classList()',
+
+		// --- Host-styles reading the signals ---
+
+		'[style.position]': 'hostPosition()', // Set 'absolute' or 'fixed' based on whether tooltip is appended to body or not
+		'[style.top]': '_hostTop()',
+		'[style.left]': '_hostLeft()',
+		'[style.padding]': '_hostStylePadding()',
+		'[style.zIndex]': '_hostStyleZIndex()',
+		'[style.width]': '_hostStyleWidth()',
+		'[style.minWidth]': '_hostStyleMinWidth()',
+		'[style.maxWidth]': '_hostStyleMaxWidth()',
+		'[style.pointerEvents]': '_hostStylePointerEvents()',
+		'[style.--transition-time]': '_transitionTime()',
+		'[style.--tooltip-text-color]': '_textColor()',
+		'[style.--tooltip-text-align]': '_textAlign()',
+		'[style.--tooltip-background-color]': '_backgroundColor()',
+		'[style.--tooltip-border-color]': '_borderColor()',
+	}
 })
 
 
@@ -44,7 +66,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	protected tooltipHtml         = signal<SafeHtml | null>(null);
 	protected tooltipTemplate!: TemplateRef<any>;
 	protected tooltipContext 	  = signal<any | null>(null);
-	
+
 	private readonly prioritizedPlacements: Placement[] = [ 'bottom', 'right', 'top', 'left', 'bottom-left', 'top-left' ];
 
 	private autoPlacement!: boolean;
@@ -52,33 +74,36 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	public hostElementPosition!: { top: number, left: number } | DOMRect;
 	private tooltipOffset!: number;
 
-	// --- State as signals ---	
+	// --- State as signals ---
 
 	// Initialize all host styles
 	public hostPosition = signal<string>('absolute');
 	private _hostStyleTop = signal<number>(0);
 	private _hostStyleLeft = signal<number>(0);
-	private _hostStylePadding = signal<string>(defaultOptions.padding!);
-	private _hostStyleZIndex = signal<number>(defaultOptions.zIndex!);
-	private _hostStyleWidth = signal<string | null>(null);
-	private _hostStyleMinWidth = signal<string | null>(null);
-	private _hostStyleMaxWidth = signal<string>(defaultOptions.maxWidth!);
-	private _hostStylePointerEvents = signal<string>(defaultOptions.pointerEvents!);
-	private _transitionTime = signal<string>(`${defaultOptions.animationDurationDefault}ms`);
-	private _textColor = signal<string>(defaultOptions.textColor!);
-	private _textAlign = signal<string>(defaultOptions.textAlign!);
-	private _backgroundColor = signal<string>(defaultOptions.backgroundColor!);
-	private _borderColor = signal<string>(defaultOptions.borderColor!);
+	protected readonly _hostStylePadding = signal<string>(defaultOptions.padding!);
+	protected readonly _hostStyleZIndex = signal<number>(defaultOptions.zIndex!);
+	protected readonly _hostStyleWidth = signal<string | null>(null);
+	protected readonly _hostStyleMinWidth = signal<string | null>(null);
+	protected readonly _hostStyleMaxWidth = signal<string>(defaultOptions.maxWidth!);
+	protected readonly _hostStylePointerEvents = signal<string>(defaultOptions.pointerEvents!);
+	protected readonly _transitionTime = signal<string>(`${defaultOptions.animationDurationDefault}ms`);
+	protected readonly _textColor = signal<string>(defaultOptions.textColor!);
+	protected readonly _textAlign = signal<string>(defaultOptions.textAlign!);
+	protected readonly _backgroundColor = signal<string>(defaultOptions.backgroundColor!);
+	protected readonly _borderColor = signal<string>(defaultOptions.borderColor!);
+
+	protected readonly _hostTop = computed(() => `${this._hostStyleTop()}px`);
+	protected readonly _hostLeft = computed(() => `${this._hostStyleLeft()}px`);
 
 	// Initialize all host classes
 	private _state      = signal<'show'|'hide'>('hide');
 	private _placement  = signal<Placement>(defaultOptions.placement!); // placement defined by user
-  	private _placementClass = computed(() => `tooltip-${this._placement()}`);
+	private _placementClass = computed(() => `tooltip-${this._placement()}`);
 	private _hasShadow = signal<boolean>(defaultOptions.shadow!);
 	private _shadowClass = computed(() => this._hasShadow() ? 'tooltip-shadow' : '');
 	private _customClass = signal<string>('');
 
-  	private _classList = computed(() => {
+	protected readonly _classList = computed(() => {
 		const parts = [
 			'tooltip',               // static base class
 			this._state(),           // 'show' | 'hide'
@@ -89,63 +114,14 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		return parts.filter(Boolean).join(' ');
 	});
 
-  	// --- Host-classes reading the signals ---
-
-	@HostBinding('class')
-	get hostClasses() { return this._classList(); }
-
-	// --- Host-styles reading the signals ---
-
-	@HostBinding('style.position') // Set 'absolute' or 'fixed' based on whether tooltip is appended to body or not
-	get hostStylePosition() { return this.hostPosition(); }
-
-    @HostBinding('style.top')
-	get hostStyleTop() { return `${this._hostStyleTop()}px`; }
-
-    @HostBinding('style.left')
-	get hostStyleLeft() { return `${this._hostStyleLeft()}px`; }
-
-	@HostBinding('style.padding')
-	get hostStylePadding() { return this._hostStylePadding(); }
-
-    @HostBinding('style.z-index')
-	get hostStyleZIndex() { return this._hostStyleZIndex(); }
-
-    @HostBinding('style.width')
-	get hostStyleWidth() { return this._hostStyleWidth(); }
-
-	@HostBinding('style.min-width')
-	get hostStyleMinWidth() { return this._hostStyleMinWidth(); }
-
-    @HostBinding('style.max-width')
-	get hostStyleMaxWidth() { return this._hostStyleMaxWidth(); }
-
-    @HostBinding('style.pointer-events')
-	get hostStylePointerEvents() { return this._hostStylePointerEvents(); }
-
-	@HostBinding('style.--transition-time')
-    get transitionTime() { return this._transitionTime(); }
-
-	@HostBinding('style.--tooltip-text-color')
-	get textColor() { return this._textColor(); }
-
-	@HostBinding('style.--tooltip-text-align')
-	get textAlign() { return this._textAlign(); }
-
-	@HostBinding('style.--tooltip-background-color')
-	get backgroundColor() { return this._backgroundColor(); }
-
-	@HostBinding('style.--tooltip-border-color')
-	get borderColor() { return this._borderColor(); }
-
 
 	private readonly destroy$ = new Subject<void>();
 
 
 	ngOnInit() {
 		this.listenToClicksOutsideTooltip();
-    	this.listenToFadeInEnd();
-    	this.listenToFadeOutEnd();
+		this.listenToFadeInEnd();
+		this.listenToFadeOutEnd();
 	}
 
 
@@ -194,7 +170,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		}
 
 		// 3) Final fallback (nothing visible) → use primary anyway
-  		this.setPlacementStyles(primaryStyles);
+		this.setPlacementStyles(primaryStyles);
 	}
 
 
@@ -202,7 +178,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 
 	private listenToClicksOutsideTooltip() {
 		fromEvent<MouseEvent>(window, 'click')
-		  	.pipe(
+			.pipe(
 				tap((event: MouseEvent) => {
 					const targetElement = event.target as HTMLElement;
 					// Check if the clicked element is not within the tooltip element
@@ -213,31 +189,31 @@ export class TooltipComponent implements OnInit, OnDestroy {
 				}),
 				takeUntil(this.destroy$)
 			)
-		  	.subscribe();
-	  }
+			.subscribe();
+	}
 
 	private listenToFadeInEnd() {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
-		  .pipe(
+			.pipe(
 				filter(event => event.propertyName === 'opacity' && this._state() === 'show'),
-				tap(() => { 
-						this.visibilityChangeCompletedSubject.next({ type: 'shown' })
-					}),
+				tap(() => {
+					this.visibilityChangeCompletedSubject.next({ type: 'shown' })
+				}),
 				takeUntil(this.destroy$),
-		  )
-		  .subscribe();
+			)
+			.subscribe();
 	}
 
 	private listenToFadeOutEnd() {
 		fromEvent<TransitionEvent>(this.elementRef.nativeElement, 'transitionend')
-		  .pipe(
+			.pipe(
 				filter(event => event.propertyName === 'opacity' && this._state() === 'hide'),
-				tap(() => { 
+				tap(() => {
 					this.visibilityChangeCompletedSubject.next({ type: 'hidden' })
 				}),
 				takeUntil(this.destroy$)
-		  )
-		  .subscribe();
+			)
+			.subscribe();
 	}
 
 	private setTooltipProperties(config: TooltipDto) {
@@ -390,7 +366,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-    	this.destroy$.next();
-    	this.destroy$.unsubscribe();
+		this.destroy$.next();
+		this.destroy$.unsubscribe();
 	}
 }

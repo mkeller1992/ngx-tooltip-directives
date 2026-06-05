@@ -1,20 +1,24 @@
-import { Directive, Input, TemplateRef } from "@angular/core";
-import { BaseTooltipDirective } from "./base-tooltip.directive";
+import { Directive, effect, input, TemplateRef } from '@angular/core';
+import { BaseTooltipDirective } from './base-tooltip.directive';
 
 @Directive({
-    selector: '[tooltipTemplate]',
-    exportAs: 'tooltipTemplate'
+	selector: '[tooltipTemplate]',
+	exportAs: 'tooltipTemplate'
 })
-
 export class TooltipTemplateDirective extends BaseTooltipDirective {
-    
-    @Input('tooltipTemplate')
-    set tooltipTemplate(value: TemplateRef<any>) {
-        super.setTooltipContent(value, 'template');
-    }
 
-    @Input('tooltipContext')
-    set tooltipContext(value: any) {
-        super.setTooltipContext(value);
-    }
+	readonly tooltipTemplate = input.required<TemplateRef<any>>();
+	readonly tooltipContext = input<any>();
+
+	constructor() {
+		super();
+
+		effect(() => {
+			super.setTooltipContent(this.tooltipTemplate(), 'template');
+		});
+
+		effect(() => {
+			super.setTooltipContext(this.tooltipContext());
+		});
+	}
 }

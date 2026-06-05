@@ -78,7 +78,7 @@ describe('BaseTooltipDirective', () => {
 			fixture.detectChanges();
 
 			/* Assert */
-			const merged = (dir as any)['mergedOptions'];
+			const merged = (dir as any)['mergedOptions']();
 			expect(merged.placement).toBe('right');
 			expect(merged.display).toBe(true);
 		});
@@ -134,7 +134,7 @@ describe('BaseTooltipDirective', () => {
 			fixtureOptionsTooltip.detectChanges();
 
 			/* Assert */
-			const mergedOptions = optionsTooltipDirectiveInstance['mergedOptions'] as TooltipOptions;
+			const mergedOptions = optionsTooltipDirectiveInstance['mergedOptions']();
 			expect(mergedOptions.id).toBe(3);
 			expect(mergedOptions.placement).toBe('left');
 			expect(mergedOptions.autoPlacement).toBe(false);
@@ -207,11 +207,11 @@ describe('BaseTooltipDirective', () => {
 			// Force touchscreen = false to avoid interference
 			vi.spyOn(dir as any, 'isTouchScreen', 'get').mockReturnValue(false);
 
-			(dir as any).mergedOptions = {
+			vi.spyOn(dir as any, 'mergedOptions').mockReturnValue({
 				display: true,
 				displayTouchscreen: true,
 				trigger: 'click'
-			};
+			});
 
 			/* Act + Assert */
 			expect((dir as any).isDisplayOnClick).toBe(true);

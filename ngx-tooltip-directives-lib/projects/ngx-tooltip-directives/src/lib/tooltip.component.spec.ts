@@ -322,7 +322,7 @@ describe('TooltipComponent', () => {
 		expect(spy).toHaveBeenCalledWith(expectedIsFixed);
 	});
 
-	it('produces numeric px values for hostStyleTop/Left after showTooltip()', () => {
+	it('produces numeric px values for host top/left styles after showTooltip()', () => {
 		component.showTooltip({
 			tooltipStr: 'pos',
 			hostElement: document.createElement('div'),
@@ -333,8 +333,9 @@ describe('TooltipComponent', () => {
 		flushRAF();
 		fixture.detectChanges();
 
-		const topVal = (component as any).hostStyleTop;
-		const leftVal = (component as any).hostStyleLeft;
+		const hostElement = fixture.nativeElement as HTMLElement;
+		const topVal = hostElement.style.top;
+		const leftVal = hostElement.style.left;
 
 		expect(topVal.endsWith('px')).toBe(true);
 		expect(leftVal.endsWith('px')).toBe(true);
