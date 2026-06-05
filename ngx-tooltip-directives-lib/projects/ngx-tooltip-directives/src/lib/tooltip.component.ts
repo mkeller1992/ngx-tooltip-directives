@@ -154,7 +154,6 @@ export class TooltipComponent implements OnInit, OnDestroy {
 		}
 
 		// 2) Auto-placement fallback
-
 		for (const placement of this.prioritizedPlacements) {
 
 			// Skip primary placement – we already checked it
