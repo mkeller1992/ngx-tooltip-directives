@@ -9,7 +9,7 @@
 	"test": "ng test --coverage",
 	"test:watch": "ng test --watch",
 	"test:ci": "ng test --watch=false --coverage",
-    "reinstall": "npx -y -p rimraf@latest rimraf node_modules package-lock.json && npm i --force",
+    "reinstall": "npx -y -p rimraf@latest rimraf node_modules && npm ci",
     "deploy": "ng build --configuration=production --base-href \"/ngx-tooltip-directives/\" && node copyIndexTo404.js"
   },
   "private": true,
