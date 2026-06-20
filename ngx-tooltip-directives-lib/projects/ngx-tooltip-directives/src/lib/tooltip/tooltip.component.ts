@@ -2,10 +2,10 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { Subject, filter, fromEvent, takeUntil, tap } from 'rxjs';
-import { ContentType } from './base-tooltip.directive';
-import { defaultOptions } from './default-options.const';
-import { TooltipOptions } from './options.interface';
-import { Placement } from './placement.type';
+import { ContentType } from '../directives/base-tooltip.directive';
+import { defaultOptions } from '../config/default-options.const';
+import { TooltipOptions } from '../config/options.interface';
+import { Placement } from '../types/placement.type';
 import { TooltipDto } from './tooltip.dto';
 
 interface TooltipStyles {

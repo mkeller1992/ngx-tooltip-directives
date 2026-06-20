@@ -1,8 +1,8 @@
 import { Directive, Input, NgModule, TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
-import { ContentType } from '../base-tooltip.directive';
-import { TooltipOptions } from '../options.interface';
-import { Placement } from '../placement.type';
+import { ContentType } from '../directives/base-tooltip.directive';
+import { TooltipOptions } from '../config/options.interface';
+import { Placement } from '../types/placement.type';
 
 @Directive()
 

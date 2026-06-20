@@ -1,10 +1,10 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { TooltipOptions } from './options.interface';
-import { TooltipOptionsService } from './options.service';
-import { TooltipHtmlDirective } from './tooltip-html.directive';
-import { TooltipStrDirective } from './tooltip-str.directive';
-import { TooltipTemplateDirective } from './tooltip-template.directive';
-import { TooltipComponent } from './tooltip.component';
+import { TooltipOptions } from './config/options.interface';
+import { TooltipOptionsService } from './config/tooltip-options.service';
+import { TooltipHtmlDirective } from './directives/tooltip-html.directive';
+import { TooltipStrDirective } from './directives/tooltip-str.directive';
+import { TooltipTemplateDirective } from './directives/tooltip-template.directive';
+import { TooltipComponent } from './tooltip/tooltip.component';
 
 @NgModule({
   imports: [

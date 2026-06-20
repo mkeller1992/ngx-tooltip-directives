@@ -1,5 +1,5 @@
-import { ContentType } from "./base-tooltip.directive";
-import { Placement } from "./placement.type";
+import { ContentType } from "../directives/base-tooltip.directive";
+import { Placement } from "../types/placement.type";
 
 export interface TooltipOptions {
     id?: string | number;

@@ -1,6 +1,6 @@
 import { TemplateRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
-import { TooltipOptions } from './options.interface';
+import { TooltipOptions } from '../config/options.interface';
 
 
 export interface TooltipDto {

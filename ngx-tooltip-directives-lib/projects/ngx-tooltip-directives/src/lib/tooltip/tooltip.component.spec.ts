@@ -3,7 +3,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { TooltipComponent } from './tooltip.component';
 import { ElementRef, provideZonelessChangeDetection } from '@angular/core';
 import { TooltipDto } from './tooltip.dto';
-import { defaultOptions } from './default-options.const';
+import { defaultOptions } from '../config/default-options.const';
 
 // Mock ElementRef for component
 const mockElementRef = { nativeElement: document.createElement('div') };

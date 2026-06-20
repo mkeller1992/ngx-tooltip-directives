@@ -1,12 +1,12 @@
 import { ComponentRef, computed, Directive, ElementRef, EventEmitter, inject, Injector, input, OnDestroy, OnInit, Output, signal, TemplateRef, ViewContainerRef } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { auditTime, filter, first, fromEvent, merge, race, Subject, switchMap, takeUntil, tap, timer } from 'rxjs';
-import { defaultOptions } from './default-options.const';
-import { TooltipOptions } from './options.interface';
-import { TooltipOptionsService } from './options.service';
-import { Placement } from './placement.type';
-import { TooltipComponent } from './tooltip.component';
-import { TooltipDto } from './tooltip.dto';
+import { defaultOptions } from '../config/default-options.const';
+import { TooltipOptions } from '../config/options.interface';
+import { TooltipOptionsService } from '../config/tooltip-options.service';
+import { Placement } from '../types/placement.type';
+import { TooltipComponent } from '../tooltip/tooltip.component';
+import { TooltipDto } from '../tooltip/tooltip.dto';
 
 export type ContentType = 'string' | 'html' | 'template';
 

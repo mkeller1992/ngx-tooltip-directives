@@ -5,9 +5,9 @@ import { By, DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BaseTooltipDirective } from './base-tooltip.directive';
 import { TooltipStrDirective } from './tooltip-str.directive';
 import { TooltipHtmlDirective } from './tooltip-html.directive';
-import { TooltipComponent } from './tooltip.component';
-import { TooltipOptions } from './options.interface';
-import { TooltipOptionsService } from './options.service';
+import { TooltipComponent } from '../tooltip/tooltip.component';
+import { TooltipOptions } from '../config/options.interface';
+import { TooltipOptionsService } from '../config/tooltip-options.service';
 import { TooltipTemplateDirective } from './tooltip-template.directive';
 import { Subject } from 'rxjs';
 
