@@ -238,14 +238,14 @@ If you want to append the tooltip to the element itself (e.g. for Shadow DOM, st
 
 ## 📡 Events
 
-Events are called in accordance with the delays specified in the options within the directive. By default, there is a no delay before the tooltip hides.
+Events are emitted according to the configured delays. The event payload is `{ type: string, position: { top: number, left: number } | DOMRect }`.
 
-| Event            | Description                                                                                 |
-|------------------|---------------------------------------------------------------------------------------------|
-| {type: "show", position: { top: number; left: number; } | DOMRect } | This event is fired prior to the tooltip's appearance. |
-| {type: "shown", position: { top: number; left: number; } | DOMRect} | This event is fired following the tooltip's appearance animation. |
-| {type: "hide", position: { top: number; left: number; } | DOMRect} | This event is fired prior to the tooltip being hidden. |
-| {type: "hidden", position: { top: number; left: number; } | DOMRect} | This event is fired after the tooltip hiding animation completes. |  
+| Type     | Description |
+|----------|-------------|
+| `show`   | Emitted before the tooltip is shown. |
+| `shown`  | Emitted after the tooltip show animation completes. |
+| `hide`   | Emitted before the tooltip is hidden. |
+| `hidden` | Emitted after the tooltip hide animation completes. |
 
 ---
 
