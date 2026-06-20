@@ -392,6 +392,86 @@ describe('BaseTooltipDirective', () => {
 			expect(showTooltipAfterDelaySpy).toHaveBeenCalledWith(0);
 		});
 
+		it('should not create tooltip when show() is called before tooltip content is initialized', () => {
+
+			/* Arrange */
+			const createTooltipSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'createTooltip');
+
+			/* Act */
+			strTooltipDirectiveInstance.show();
+
+			/* Assert */
+			expect(createTooltipSpy).not.toHaveBeenCalled();
+		});
+
+		it('should not subscribe to automatic hide listeners when show() is called by the consuming application', () => {
+
+			/* Arrange */
+			const tooltipEl = document.createElement('div');
+			document.body.appendChild(tooltipEl);
+
+			const showTooltipSpy = vi.fn();
+			const fakeTooltipComponent = {
+				showTooltip: showTooltipSpy,
+				userClickOutsideTooltip$: new Subject<MouseEvent>()
+			};
+
+			(strTooltipDirectiveInstance as any).tooltipComponent = fakeTooltipComponent;
+			(strTooltipDirectiveInstance as any).refToTooltipComponent = {
+				location: { nativeElement: tooltipEl }
+			};
+
+			const createTooltipSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'createTooltip');
+			const subscribeToHideTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToHideTriggers');
+			const subscribeToResizeEventsSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
+
+			fixtureStrTooltip.detectChanges();
+
+			/* Act */
+			strTooltipDirectiveInstance.show();
+
+			/* Assert */
+			expect(createTooltipSpy).not.toHaveBeenCalled();
+			expect(showTooltipSpy).toHaveBeenCalledWith(expect.objectContaining({
+				tooltipStr: 'Tooltip String Text'
+			}));
+			expect(subscribeToHideTriggersSpy).not.toHaveBeenCalled();
+			expect(subscribeToResizeEventsSpy).not.toHaveBeenCalled();
+
+			document.body.removeChild(tooltipEl);
+		});
+
+		it('should subscribe to automatic hide listeners when the directive opens the tooltip from a trigger', () => {
+
+			/* Arrange */
+			const tooltipEl = document.createElement('div');
+			document.body.appendChild(tooltipEl);
+
+			const fakeTooltipComponent = {
+				showTooltip: vi.fn(),
+				userClickOutsideTooltip$: new Subject<MouseEvent>()
+			};
+
+			(strTooltipDirectiveInstance as any).tooltipComponent = fakeTooltipComponent;
+			(strTooltipDirectiveInstance as any).refToTooltipComponent = {
+				location: { nativeElement: tooltipEl }
+			};
+
+			const subscribeToHideTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToHideTriggers');
+			const subscribeToResizeEventsSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToResizeEvents');
+
+			fixtureStrTooltip.detectChanges();
+
+			/* Act */
+			strTooltipDirectiveInstance.show(false);
+
+			/* Assert */
+			expect(subscribeToHideTriggersSpy).toHaveBeenCalledTimes(1);
+			expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(1);
+
+			document.body.removeChild(tooltipEl);
+		});
+
 		it('should subscribe to correct listeners when tooltip gets displayed for the second time', () => {
 
 			/* Arrange */
@@ -729,6 +809,87 @@ describe('BaseTooltipDirective', () => {
 			expect(setTooltipVisibilitySpy).toHaveBeenCalledTimes(1);
 			expect(hideTooltipOnHostComponentSpy).toHaveBeenCalledTimes(1);
 			expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
+		});
+
+		it('should not hide tooltip when hide() is called while tooltip is not visible', () => {
+
+			/* Arrange */
+			const setTooltipVisibilitySpy = vi.spyOn(strTooltipDirectiveInstance as any, 'setTooltipVisibility');
+			const subscribeToShowTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
+
+			strTooltipDirectiveInstance['isTooltipVisible'] = false;
+
+			/* Act */
+			strTooltipDirectiveInstance.hide(false);
+
+			/* Assert */
+			expect(setTooltipVisibilitySpy).not.toHaveBeenCalled();
+			expect(subscribeToShowTriggersSpy).not.toHaveBeenCalled();
+		});
+
+		it('should resubscribe to show triggers after hide() is called internally', () => {
+
+			/* Arrange */
+			const tooltipEl = document.createElement('div');
+			document.body.appendChild(tooltipEl);
+
+			const hideTooltipSpy = vi.fn();
+			(strTooltipDirectiveInstance as any).tooltipComponent = {
+				hideTooltip: hideTooltipSpy
+			};
+			(strTooltipDirectiveInstance as any).refToTooltipComponent = {
+				location: { nativeElement: tooltipEl }
+			};
+			strTooltipDirectiveInstance['isTooltipVisible'] = true;
+
+			const subscribeToShowTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
+
+			/* Act */
+			strTooltipDirectiveInstance.hide(false);
+
+			/* Assert */
+			expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
+			expect(subscribeToShowTriggersSpy).toHaveBeenCalledTimes(1);
+			expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
+
+			document.body.removeChild(tooltipEl);
+		});
+
+		it('should emit hide and hidden when a visible tooltip is destroyed', () => {
+
+			/* Arrange */
+			fixtureStrTooltip.detectChanges();
+
+			const tooltipEl = document.createElement('div');
+			document.body.appendChild(tooltipEl);
+
+			const destroySpy = vi.fn();
+			(strTooltipDirectiveInstance as any).refToTooltipComponent = {
+				location: { nativeElement: tooltipEl },
+				destroy: destroySpy
+			};
+			(strTooltipDirectiveInstance as any).tooltipComponent = {};
+			strTooltipDirectiveInstance['isTooltipVisible'] = true;
+
+			const emitSpy = vi.spyOn(strTooltipDirectiveInstance.events, 'emit');
+
+			/* Act */
+			(strTooltipDirectiveInstance as any).destroyTooltip();
+
+			/* Assert */
+			expect(destroySpy).toHaveBeenCalledTimes(1);
+			expect(emitSpy).toHaveBeenCalledWith({
+				type: 'hide',
+				position: expect.any(Object)
+			});
+			expect(emitSpy).toHaveBeenCalledWith({
+				type: 'hidden',
+				position: expect.any(Object)
+			});
+			expect((strTooltipDirectiveInstance as any).tooltipComponent).toBeUndefined();
+			expect((strTooltipDirectiveInstance as any).refToTooltipComponent).toBeUndefined();
+
+			document.body.removeChild(tooltipEl);
 		});
 	});
 
