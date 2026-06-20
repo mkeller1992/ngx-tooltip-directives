@@ -5,6 +5,7 @@ import { defaultOptions } from '../config/default-options.const';
 import { TooltipOptions } from '../config/options.interface';
 import { TooltipOptionsService } from '../config/tooltip-options.service';
 import { Placement } from '../types/placement.type';
+import { TooltipEvent } from '../types/tooltip-event.type';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { TooltipDto } from '../tooltip/tooltip.dto';
 
@@ -98,7 +99,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 
 
 	@Output()
-	events = new EventEmitter<{ type: string, position: { top: number, left: number } | DOMRect }>();
+	events = new EventEmitter<TooltipEvent>();
 
 
 	private refToTooltipComponent: ComponentRef<TooltipComponent> | undefined;
@@ -159,7 +160,23 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 
 	/* Public methods for library-users */
 
-	public show(isInvokedFromOutside = true) {
+	public show() {
+		this.showTooltip({ subscribeToAutomaticHideListeners: false });
+	}
+
+	public hide() {
+		this.hideTooltip({ subscribeToAutomaticShowListeners: false });
+	}
+
+	private showFromTrigger() {
+		this.showTooltip({ subscribeToAutomaticHideListeners: true });
+	}
+
+	private hideFromTrigger() {
+		this.hideTooltip({ subscribeToAutomaticShowListeners: true });
+	}
+
+	private showTooltip(options: { subscribeToAutomaticHideListeners: boolean }) {
 		if (this._tooltipContent && this.contentType) {
 			// Stop all ongoing processes:
 			this.clearTimeouts$.next();
@@ -168,18 +185,20 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 			if (this.tooltipComponent && !this.isTooltipComponentDestroyed) {
 				this.setTooltipVisibility('visible');
 				// Subscribe to input-events:
-				if (!isInvokedFromOutside) {
+				if (options.subscribeToAutomaticHideListeners) {
 					this.subscribeToHideTriggers();
 					this.subscribeToResizeEvents();
 				}
 			}
 			else {
-				this.createTooltip(isInvokedFromOutside);
+				this.createTooltip({
+					subscribeToAutomaticHideListeners: options.subscribeToAutomaticHideListeners
+				});
 			}
 		}
 	}
 
-	public hide(isInvokedFromOutside = true) {
+	private hideTooltip(options: { subscribeToAutomaticShowListeners: boolean }) {
 		if (this.isTooltipVisible) {
 			// Stop all ongoing processes:
 			this.clearTimeouts$.next();
@@ -188,7 +207,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 			this.setTooltipVisibility('hidden');
 
 			// Subscribe to input-events:
-			if (!isInvokedFromOutside) {
+			if (options.subscribeToAutomaticShowListeners) {
 				this.subscribeToShowTriggers();
 			}
 		}
@@ -274,7 +293,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 			.subscribe();
 	}
 
-	private createTooltip(isInvokedFromOutside: boolean) {
+	private createTooltip(options: { subscribeToAutomaticHideListeners: boolean }) {
 		// Stop all ongoing processes:
 		this.clearTimeouts$.next();
 
@@ -287,7 +306,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 					this.appendTooltipToDomElement(appendToTooltipBody);
 					this.setTooltipVisibility('visible');
 					// Subscribe to input-events:
-					if (!isInvokedFromOutside) {
+					if (options.subscribeToAutomaticHideListeners) {
 						this.subscribeToHideTriggers();
 						this.subscribeToResizeEvents();
 					}
@@ -301,7 +320,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 		return timer(delayInMillis)
 			.pipe(
 				takeUntil(this.clearTimeouts$),
-				tap(() => this.show(false))
+				tap(() => this.showFromTrigger())
 			);
 	}
 
@@ -309,7 +328,7 @@ export abstract class BaseTooltipDirective implements OnInit, OnDestroy {
 		return timer(delayInMillis)
 			.pipe(
 				takeUntil(this.clearTimeouts$),
-				tap(() => this.hide(false))
+				tap(() => this.hideFromTrigger())
 			);
 	}
 

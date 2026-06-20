@@ -8,6 +8,7 @@ import { TooltipHtmlDirective } from './tooltip-html.directive';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { TooltipOptions } from '../config/options.interface';
 import { TooltipOptionsService } from '../config/tooltip-options.service';
+import { TooltipEventType } from '../types/tooltip-event.type';
 import { TooltipTemplateDirective } from './tooltip-template.directive';
 import { Subject } from 'rxjs';
 
@@ -256,7 +257,7 @@ describe('BaseTooltipDirective', () => {
 			const tooltipEl = document.createElement('div');
 
 			// Fake event stream
-			const visibility$ = new Subject<{ type: string }>();
+			const visibility$ = new Subject<{ type: Extract<TooltipEventType, 'shown' | 'hidden'> }>();
 
 			// Fake tooltip component
 			const fakeTooltipComponent = {
@@ -303,7 +304,7 @@ describe('BaseTooltipDirective', () => {
 			const tooltipEl = document.createElement('div');
 
 			// Fake event stream
-			const visibility$ = new Subject<{ type: string }>();
+			const visibility$ = new Subject<{ type: Extract<TooltipEventType, 'shown' | 'hidden'> }>();
 
 			// Fake tooltip component
 			const fakeTooltipComponent = {
@@ -463,7 +464,7 @@ describe('BaseTooltipDirective', () => {
 			fixtureStrTooltip.detectChanges();
 
 			/* Act */
-			strTooltipDirectiveInstance.show(false);
+			(strTooltipDirectiveInstance as any).showFromTrigger();
 
 			/* Assert */
 			expect(subscribeToHideTriggersSpy).toHaveBeenCalledTimes(1);
@@ -508,11 +509,11 @@ describe('BaseTooltipDirective', () => {
 			expect(subscribeToResizeEventsSpy).toHaveBeenCalledTimes(1);
 		});
 
-		it('should trigger show() on first user-click when isDisplayOnClick is set', () => {
+		it('should open tooltip through the internal trigger flow on first user-click when isDisplayOnClick is set', () => {
 
 			/* Arrange */
 			vi.useFakeTimers();
-			const showSpy = vi.spyOn(strTooltipDirectiveInstance, 'show');
+			const showFromTriggerSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'showFromTrigger');
 
 			// Mock return-values of the getters 'isDisplayOnHover()' and 'isDisplayOnClick()'
 			vi.spyOn(strTooltipDirectiveInstance as any, 'isDisplayOnHover', 'get').mockReturnValue(false);
@@ -525,8 +526,7 @@ describe('BaseTooltipDirective', () => {
 			vi.advanceTimersByTime(1);
 
 			/* Assert */
-			expect(showSpy).toHaveBeenCalledTimes(1);
-			expect(showSpy).toHaveBeenCalledWith(false);
+			expect(showFromTriggerSpy).toHaveBeenCalledTimes(1);
 		});
 
 		it('should create and show correct tooltip-string when mouse enters element with tooltip', () => {
@@ -645,7 +645,7 @@ describe('BaseTooltipDirective', () => {
 
 			const tooltipEl = document.createElement('div');
 
-			const fakeVisibility$ = new Subject<{ type: string }>();
+			const fakeVisibility$ = new Subject<{ type: Extract<TooltipEventType, 'shown' | 'hidden'> }>();
 
 			(dir as any).hostElementRef = { nativeElement: document.createElement('div') };
 
@@ -820,11 +820,39 @@ describe('BaseTooltipDirective', () => {
 			strTooltipDirectiveInstance['isTooltipVisible'] = false;
 
 			/* Act */
-			strTooltipDirectiveInstance.hide(false);
+			(strTooltipDirectiveInstance as any).hideFromTrigger();
 
 			/* Assert */
 			expect(setTooltipVisibilitySpy).not.toHaveBeenCalled();
 			expect(subscribeToShowTriggersSpy).not.toHaveBeenCalled();
+		});
+
+		it('should not subscribe to automatic show listeners when hide() is called by the consuming application', () => {
+
+			/* Arrange */
+			const tooltipEl = document.createElement('div');
+			document.body.appendChild(tooltipEl);
+
+			const hideTooltipSpy = vi.fn();
+			(strTooltipDirectiveInstance as any).tooltipComponent = {
+				hideTooltip: hideTooltipSpy
+			};
+			(strTooltipDirectiveInstance as any).refToTooltipComponent = {
+				location: { nativeElement: tooltipEl }
+			};
+			strTooltipDirectiveInstance['isTooltipVisible'] = true;
+
+			const subscribeToShowTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
+
+			/* Act */
+			strTooltipDirectiveInstance.hide();
+
+			/* Assert */
+			expect(hideTooltipSpy).toHaveBeenCalledTimes(1);
+			expect(subscribeToShowTriggersSpy).not.toHaveBeenCalled();
+			expect(strTooltipDirectiveInstance['isTooltipVisible']).toBe(false);
+
+			document.body.removeChild(tooltipEl);
 		});
 
 		it('should resubscribe to show triggers after hide() is called internally', () => {
@@ -845,7 +873,7 @@ describe('BaseTooltipDirective', () => {
 			const subscribeToShowTriggersSpy = vi.spyOn(strTooltipDirectiveInstance as any, 'subscribeToShowTriggers');
 
 			/* Act */
-			strTooltipDirectiveInstance.hide(false);
+			(strTooltipDirectiveInstance as any).hideFromTrigger();
 
 			/* Assert */
 			expect(hideTooltipSpy).toHaveBeenCalledTimes(1);

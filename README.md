@@ -238,7 +238,7 @@ If you want to append the tooltip to the element itself (e.g. for Shadow DOM, st
 
 ## 📡 Events
 
-Events are emitted according to the configured delays. The event payload is `{ type: string, position: { top: number, left: number } | DOMRect }`.
+Events are emitted according to the configured delays. The event payload is `{ type: TooltipEventType, position: { top: number, left: number } | DOMRect }`.
 
 | Type     | Description |
 |----------|-------------|

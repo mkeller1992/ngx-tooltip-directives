@@ -7,6 +7,7 @@ export * from './lib/directives/tooltip-html.directive';
 export * from './lib/directives/tooltip-template.directive';
 export * from './lib/ngx-tooltip-directives.module';
 export * from './lib/config/options.interface';
+export * from './lib/types/tooltip-event.type';
 
 // Export the mocks
 export * from './lib/mocks/mock-ngx-tooltip-directives.module';

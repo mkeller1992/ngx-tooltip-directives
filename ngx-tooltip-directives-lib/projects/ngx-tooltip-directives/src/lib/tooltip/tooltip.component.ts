@@ -6,6 +6,7 @@ import { ContentType } from '../directives/base-tooltip.directive';
 import { defaultOptions } from '../config/default-options.const';
 import { TooltipOptions } from '../config/options.interface';
 import { Placement } from '../types/placement.type';
+import { TooltipEventType } from '../types/tooltip-event.type';
 import { TooltipDto } from './tooltip.dto';
 
 interface TooltipStyles {
@@ -57,7 +58,7 @@ export class TooltipComponent implements OnInit, OnDestroy {
 	userClickOutsideTooltip$ = this.userClickOutsideTooltipSubject.asObservable();
 
 	// This information is purely for the user to know when the tooltip is shown or hidden:
-	private visibilityChangeCompletedSubject = new Subject<{ type: string }>();
+	private visibilityChangeCompletedSubject = new Subject<{ type: Extract<TooltipEventType, 'shown' | 'hidden'> }>();
 	visibilityChangeCompleted$ = this.visibilityChangeCompletedSubject.asObservable();
 
 	// --- Tooltip Content ---
