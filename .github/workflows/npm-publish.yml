@@ -62,10 +62,12 @@ jobs:
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
 
+      # List generated LCOV reports for troubleshooting
       - name: List coverage reports
         run: find coverage -name lcov.info -print
         working-directory: ${{ env.BASE_DIR }}
 
+      # Copy the generated report to a predictable path for Codecov
       - name: Normalize coverage report path
         run: |
           LCOV_FILE="$(find coverage -name lcov.info -print -quit)"
@@ -73,6 +75,8 @@ jobs:
             echo "No lcov.info file found"
             exit 1
           fi
+
+          echo "Using coverage report: $LCOV_FILE"
           mkdir -p coverage/codecov
           cp "$LCOV_FILE" coverage/codecov/lcov.info
         working-directory: ${{ env.BASE_DIR }}
@@ -84,6 +88,7 @@ jobs:
           use_oidc: true
           files: ${{ env.BASE_DIR }}/coverage/codecov/lcov.info
           disable_search: true                           # skip auto-discovery to avoid noisy gcov/python warnings
+          fail_ci_if_error: true                         # fail the pipeline if the upload fails
 
       # Build the library from the specified subdirectory
       - name: Build Library
