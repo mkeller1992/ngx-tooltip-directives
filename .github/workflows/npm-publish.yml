@@ -62,12 +62,27 @@ jobs:
         run: npm run test:ci
         working-directory: ${{ env.BASE_DIR }}
 
+      - name: List coverage reports
+        run: find coverage -name lcov.info -print
+        working-directory: ${{ env.BASE_DIR }}
+
+      - name: Normalize coverage report path
+        run: |
+          LCOV_FILE="$(find coverage -name lcov.info -print -quit)"
+          if [ -z "$LCOV_FILE" ]; then
+            echo "No lcov.info file found"
+            exit 1
+          fi
+          mkdir -p coverage/codecov
+          cp "$LCOV_FILE" coverage/codecov/lcov.info
+        working-directory: ${{ env.BASE_DIR }}
+
       # Upload coverage to Codecov (tokenless with OIDC + Codecov App)
       - name: Upload coverage to Codecov
         uses: *codecov-action
         with:
           use_oidc: true
-          files: ${{ env.BASE_DIR }}/coverage/lcov.info  # point directly to LCOV file for faster uploads
+          files: ${{ env.BASE_DIR }}/coverage/codecov/lcov.info
           disable_search: true                           # skip auto-discovery to avoid noisy gcov/python warnings
 
       # Build the library from the specified subdirectory
