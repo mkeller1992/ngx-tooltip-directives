@@ -1,8 +1,20 @@
-name: CI/CD Pipeline
+name: Deploy ngx-tooltip-directives to npmjs.com
 
 on:
   push:
     branches: [ master ]
+
+# Central versions and reusable action references
+env:
+  BASE_DIR: ./ngx-tooltip-directives-lib
+  PROJECT_NAME: ngx-tooltip-directives
+
+  NODE_VERSION: &node-version '24.x'
+  NPM_VERSION: &npm-version 'latest'
+
+  CHECKOUT_ACTION: &checkout-action 'actions/checkout@v7'
+  SETUP_NODE_ACTION: &setup-node-action 'actions/setup-node@v6.4.0'
+  CODECOV_ACTION: &codecov-action 'codecov/codecov-action@v7'
 
 # Needed for OIDC (Trusted Publishing) and for pushing tags back to the repo
 permissions:
@@ -12,23 +24,20 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    env:
-      BASE_DIR: ./ngx-tooltip-directives-lib
-      PROJECT_NAME: ngx-tooltip-directives
 
     steps:
       # Checkout the repository to the runner
-      - uses: actions/checkout@v5
+      - uses: *checkout-action
 
       # Setup Node.js environment
       - name: Use Node.js
-        uses: actions/setup-node@v6
+        uses: *setup-node-action
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       # Ensure a recent npm that supports Trusted Publishing + provenance
       - name: Ensure recent npm
-        run: npm i -g npm@latest
+        run: npm i -g npm@${{ env.NPM_VERSION }}
 
       # Safety: remove any accidental project .npmrc that could force tokens
       - name: Remove local .npmrc if present
@@ -55,7 +64,7 @@ jobs:
 
       # Upload coverage to Codecov (tokenless with OIDC + Codecov App)
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: *codecov-action
         with:
           use_oidc: true
           files: ${{ env.BASE_DIR }}/coverage/lcov.info  # point directly to LCOV file for faster uploads
