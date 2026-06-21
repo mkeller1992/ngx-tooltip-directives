@@ -13,20 +13,20 @@ Tooltips are informative pop-up tips that appear when you hover over or click on
 
 ---
 
-## 🎯 Demo
+## Demo
 https://mkeller1992.github.io/ngx-tooltip-directives/
 
 ---
 
-## 📦 Install
+## Install
 
 To install the library, enter the following command in your console:
 ```
 npm i ngx-tooltip-directives
 ```
 
-## 🛠️ Setup
-### 🧱 For apps based on `Standalone Components`
+## Setup
+### Standalone Components
 Import the directives for the respective tooltips directly in your component:
 ```ts
 import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } from '@ngx-tooltip-directives';
@@ -40,7 +40,7 @@ import { TooltipHtmlDirective, TooltipStrDirective, TooltipTemplateDirective } f
 ```
 
 
-### 🧱 For apps based on `ngModule`
+### NgModule
 Make sure you import `NgxTooltipDirectivesModule` into your `@NgModule`:
 ```ts
 import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
@@ -50,16 +50,16 @@ import { NgxTooltipDirectivesModule } from 'ngx-tooltip-directives';
 }) 
 ```
 
-## 🚀 Usage
+## Usage
 There are three ways of creating a tooltip:
     
-### 💬 Pass the tooltip text as a string via `tooltipStr`:
+### String tooltips
 
 ```html
 <div tooltipStr="Tooltip text">Show Tooltip</div>
 ```
 
-### 🧩 Pass the tooltip content as SafeHtml via `tooltipHtml`:
+### HTML tooltips
 
 ```html
 <div [tooltipHtml]="safeTooltipHtml" placement="right">Show Html Tooltip</div>
@@ -78,7 +78,7 @@ export class AppComponent {
 }
 ```
 
-### 🧪 Pass the tooltip content as template via `tooltipTemplate`:
+### Template tooltips
 
 ```html
 <ng-template #myTemplate>
@@ -112,7 +112,7 @@ context = { estimate: 10 };
 
 ---
 
-## 🧑‍💻 Trigger tooltip programmatically
+## Trigger Tooltips Programmatically
 ```html
 <div tooltip [tooltipStr]="'Tooltip text'" #myTooltip="tooltipStr"></div>
 
@@ -134,7 +134,7 @@ hide() {
 
 ---
 
-## ⚙️ 3 ways of setting tooltip options
+## Tooltip Options
 
 1 - Options can be set via html-attributes, so they have the highest priority:
 
@@ -191,7 +191,7 @@ const myDefaultTooltipOptions: TooltipOptions = {
 ```
 ---
 
-### ⚙️ `appendTooltipToBody` – controlling where the tooltip is attached
+### `appendTooltipToBody`
 
 By default, tooltips are appended to the `<body>` to ensure correct positioning regardless of scrollable containers or layout restrictions.  
 If you want to append the tooltip to the element itself (e.g. for Shadow DOM, strict layouts, or component-scoped tooltips), set:
@@ -204,7 +204,7 @@ If you want to append the tooltip to the element itself (e.g. for Shadow DOM, st
 
 ---
 
-## 🧾 Properties
+## Properties
 
 | name                  | type                                  | default | description |
 |-----------------------|---------------------------------------|---------|-------------|
@@ -236,7 +236,7 @@ If you want to append the tooltip to the element itself (e.g. for Shadow DOM, st
 
 ---
 
-## 📡 Events
+## Events
 
 Events are emitted according to the configured delays. The event payload is `{ type: TooltipEventType, position: { top: number, left: number } | DOMRect }`.
 
@@ -249,7 +249,7 @@ Events are emitted according to the configured delays. The event payload is `{ t
 
 ---
 
-## 🤖 Methods
+## Methods
 
 If you have defined the directive options, these will be taken into consideration when calling the methods. This includes the delay before the tooltip appears and before it hides.
 
@@ -260,7 +260,7 @@ If you have defined the directive options, these will be taken into consideratio
 
 ---
 
-## 🧪 Testing with NgxTooltipDirectives
+## Testing
 
 To simplify unit testing of components that use `NgxTooltipDirectives`, this library provides a set of mock directives as well as a mock module. You can use these mocks to bypass the actual directive behavior in your tests, focusing on the component logic instead.
 
